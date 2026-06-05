@@ -1,0 +1,39 @@
+# ───────────────────────────────────────────────────────────────
+# VR Realms Creator Kit — .gitignore
+# The repo holds DOCS + the lean UE project (Config + Content).
+# Build caches and the 162 MB Tools/ binaries do NOT go in git —
+# the WorkshopTool ships as a ZIP attached to a GitHub Release.
+# ───────────────────────────────────────────────────────────────
+
+# --- UE build caches / generated (never commit) ---
+VRRealms/Intermediate/
+VRRealms/Saved/
+VRRealms/DerivedDataCache/
+VRRealms/Build/
+VRRealms/Binaries/
+VRRealms/.vs/
+VRRealms/*.sln
+
+# --- Shipped tool binaries (distributed via GitHub Releases, not git) ---
+Tools/
+
+# --- WorkshopTool runtime/user state (must never ship) ---
+**/workshop_tool_settings.json
+**/CookTemp/
+**/Staging/
+*.pdb
+
+# --- Internal dev notes — NEVER ship to creators (mention internal assets/process) ---
+KIT_BUILD_NOTES.md
+KIT_TEMPLATES_SETUP.md
+GAME-SIDE_SETUP.txt
+KitInternal/
+*_DEV_NOTES*
+*_INTERNAL*
+*GAME-SIDE*
+
+# --- OS / editor junk ---
+Thumbs.db
+desktop.ini
+.DS_Store
+*~

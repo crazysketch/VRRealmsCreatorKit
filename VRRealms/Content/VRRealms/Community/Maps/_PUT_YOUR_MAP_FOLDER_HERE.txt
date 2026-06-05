@@ -1,0 +1,13 @@
+Put each map in its own folder here:
+
+    Content/VRRealms/Community/Maps/<YourMapName>/Maps/<YourMapName>.umap
+    Content/VRRealms/Community/Maps/<YourMapName>/Materials/...
+    Content/VRRealms/Community/Maps/<YourMapName>/Meshes/...
+    (textures, etc.)
+
+The folder name is your map's identity. The .umap MUST live under a /Maps/
+subfolder inside it, exactly as shown. The WorkshopTool detects this layout
+automatically and refuses anything outside it.
+
+Do NOT rename "Community" or "Maps" — the running game resolves your content at
+/Game/VRRealms/Community/Maps/<YourMapName>/... and the path must match exactly.

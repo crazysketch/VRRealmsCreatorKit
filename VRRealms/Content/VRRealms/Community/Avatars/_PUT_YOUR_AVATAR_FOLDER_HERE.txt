@@ -1,0 +1,14 @@
+Put each avatar in its own folder here:
+
+    Content/VRRealms/Community/Avatars/<YourAvatarName>/Meshes/SKM_<YourAvatarName>.uasset
+    Content/VRRealms/Community/Avatars/<YourAvatarName>/Materials/...
+    Content/VRRealms/Community/Avatars/<YourAvatarName>/Textures/...
+
+When you import your avatar FBX, you MUST set the Skeleton field to the bundled
+VR Realms mannequin skeleton at:
+    /Game/VRRealms/AvatarRig/SK_VRUE5Mannequin
+Do NOT leave it empty — that creates a duplicate skeleton and your avatar's body
+will be invisible in game.
+
+Do NOT rename "Community" or "Avatars" — the running game resolves your content at
+/Game/VRRealms/Community/Avatars/<YourAvatarName>/... and the path must match exactly.

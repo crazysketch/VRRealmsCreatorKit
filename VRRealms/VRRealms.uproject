@@ -1,0 +1,7 @@
+{
+	"FileVersion": 3,
+	"EngineAssociation": "5.7",
+	"Category": "",
+	"Description": "VRRealms Creator Kit — author Steam Workshop maps and avatars for VR Realms. Content-only: no C++ module, no gameplay plugins, no engine source required.",
+	"Plugins": []
+}
