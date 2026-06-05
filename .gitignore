@@ -32,6 +32,9 @@ KitInternal/
 *_INTERNAL*
 *GAME-SIDE*
 
+# --- Author-machine launcher shortcut (ships inside the ZIP, never in git — abs paths) ---
+*.lnk
+
 # --- OS / editor junk ---
 Thumbs.db
 desktop.ini
