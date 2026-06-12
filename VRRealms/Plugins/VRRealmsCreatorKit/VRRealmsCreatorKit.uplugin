@@ -1,0 +1,22 @@
+{
+	"FileVersion": 3,
+	"Version": 1,
+	"VersionName": "1.0",
+	"FriendlyName": "VR Realms Creator Kit",
+	"Description": "In-editor Steam Workshop pipeline for VR Realms: validate avatars against the shipped skeletons, auto-fix bone-extended rigs, cook, pak and upload. Tools menu > VR Realms Workshop.",
+	"Category": "VR Realms",
+	"CreatedBy": "DevGamesVR",
+	"CreatedByURL": "https://www.vr-realms.com",
+	"CanContainContent": false,
+	"IsBetaVersion": false,
+	"Installed": false,
+	"EnabledByDefault": true,
+	"Modules": [
+		{
+			"Name": "VRRealmsCreatorKit",
+			"Type": "Editor",
+			"LoadingPhase": "Default",
+			"PlatformAllowList": [ "Win64" ]
+		}
+	]
+}
