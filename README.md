@@ -1,8 +1,13 @@
-# VR Realms Creator Kit — v0.2.0 (Alpha)
+# VR Realms Creator Kit — v0.2.1 (Alpha)
 
 Build maps and avatars for **VR Realms** and publish them to the Steam Workshop.
 You do **not** need Visual Studio, C++, or the VR Realms source — just Unreal
 Engine 5.7 and a Steam account that has VR Realms in its library.
+
+**New in v0.2.1:** the in-editor validator now also warns about content that hurts
+players in multiplayer — avatars with **wrist-twist skinning** problems (the "bow-tie"
+wrist) and **memory-heavy avatars** (oversized textures / dense meshes that can crash
+low-RAM players) — plus a **Documentation** button that opens the guides.
 
 **New in v0.2:** the old external WorkshopTool .exe is gone. Everything now runs
 **inside the Unreal editor** — one button validates your content, fixes common

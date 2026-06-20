@@ -24,6 +24,7 @@ Tools/
 *.pdb
 
 # --- Internal dev notes — NEVER ship to creators (mention internal assets/process) ---
+CLAUDE.md
 KIT_BUILD_NOTES.md
 KIT_TEMPLATES_SETUP.md
 GAME-SIDE_SETUP.txt
