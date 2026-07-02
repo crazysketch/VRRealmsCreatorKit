@@ -1,8 +1,12 @@
-# VR Realms Creator Kit — v0.2.1 (Alpha)
+# VR Realms Creator Kit — v0.3.0 (Alpha, UE 5.8)
 
 Build maps and avatars for **VR Realms** and publish them to the Steam Workshop.
 You do **not** need Visual Studio, C++, or the VR Realms source — just Unreal
-Engine 5.7 and a Steam account that has VR Realms in its library.
+Engine 5.8 and a Steam account that has VR Realms in its library.
+
+**New in v0.3.0:** the kit moved to **Unreal Engine 5.8** to match the game. Content
+built with this kit requires the UE 5.8 version of VR Realms (and older 5.7 kit
+uploads will need a re-publish with this kit once the 5.8 game ships).
 
 **New in v0.2.1:** the in-editor validator now also warns about content that hurts
 players in multiplayer — avatars with **wrist-twist skinning** problems (the "bow-tie"
@@ -21,11 +25,11 @@ problems automatically, builds the pak, and uploads it to Steam.
 
 ## 1. Install
 
-1. Install **Unreal Engine 5.7** from the Epic Games Launcher (free).
+1. Install **Unreal Engine 5.8** from the Epic Games Launcher (free).
 2. Install **SteamCMD** (https://developer.valvesoftware.com/wiki/SteamCMD) and note
    where `steamcmd.exe` lives (the uploader uses it behind the scenes).
 3. Unzip this kit anywhere (avoid very deep folder paths).
-4. Open `VRRealms/VRRealms.uproject` in UE 5.7. The Workshop tool is already
+4. Open `VRRealms/VRRealms.uproject` in UE 5.8. The Workshop tool is already
    installed as a plugin — open it from the top menu bar: **Tools → VR Realms Workshop**.
 
 ## 2. One-time Steam login (do this first, or uploads will fail)
@@ -120,7 +124,7 @@ subscribers get it automatically.
 
 ## Rules / standards
 
-- Engine: **UE 5.7** only.
+- Engine: **UE 5.8** only.
 - Avatars: standard **UE4 or UE5 mannequin** rig (see §3 — extra bones welcome).
 - **Do NOT enable Nanite on your meshes.** VR Realms uses the VR forward renderer,
   and Nanite only works with deferred rendering — Nanite-enabled meshes will be

@@ -36,6 +36,89 @@ external tool could never do.
 - **Settings**: steamcmd.exe path + Steam username; one-time interactive Steam login
   (SteamCMD caches the session, uploads run silently afterwards). No passwords stored.
 
+## Interactables — make a grabbable (tag-based)
+
+You don't need VRE in the kit to add interactive objects. Place a plain **Static Mesh
+Actor**, give it your mesh, and add an **Actor Tag** — the shipping game upgrades it into
+the real interactable at runtime, so the kit itself stays content-only.
+
+**Grabbable (v1):**
+1. Drag a **Static Mesh Actor** into your map (the engine actor — *not* a VRE one).
+2. Set its **Static Mesh** (and materials) to whatever should be grabbable.
+3. In **Details → Actor → Tags**, add one tag: `VRGrab`
+4. Place it where it should rest, then publish the map as normal.
+
+In VR Realms, when the map loads, every `VRGrab`-tagged actor becomes a real **physics
+grabbable** — players can pick it up and throw it. Your mesh + materials carry over; the
+marker is replaced automatically.
+
+### Grab options (optional tags)
+
+Add any of these **alongside** `VRGrab` (or use them on their own — they also enable grab)
+to tweak how the object behaves. Tags are case-insensitive.
+
+| Tag | Effect |
+|---|---|
+| `VRGrab` | One-hand physics grabbable — falls when dropped, throwable. The default. |
+| `VRGrab.TwoHand` | Two-handed grip (a second hand can grab it — good for big/long objects). |
+| `VRGrab.Static` | No physics — stays exactly where you release it. Still grabbable. Good for shelf/wall props. |
+| `VRGrab.NoGravity` | Physics on, gravity off — floats wherever it's left. |
+| `VRGrab.Heavy` | Heavier — a more weighty, sluggish feel. |
+| `VRGrab.Light` | Lighter — easier to fling around. |
+
+Mix them, e.g. `VRGrab.TwoHand` + `VRGrab.Heavy` for a heavy two-handed object.
+(`Heavy` wins if you set both `Heavy` and `Light`.)
+
+Notes:
+- **One mesh per grabbable.** Tag a plain **Static Mesh Actor**, *not* a Blueprint. For a multi-part
+  object (e.g. a bottle + a cap as separate meshes), merge the parts into one mesh first — select
+  them in the level → **Actor menu → Merge Actors** — then tag that single Static Mesh Actor.
+  (A Blueprint with multiple mesh components won't work; the grabbable holds one mesh.)
+- **It won't be grabbable inside the kit editor** (the kit has no VRE) — that's expected.
+  Test grabbing by publishing and loading the map in VR Realms, same as everything else.
+- Your mesh needs **collision** to be thrown/simulated — set Collision Complexity / a simple
+  collision on the mesh, or it'll spawn but won't move.
+- More interactables (mirrors, buttons, seats, …) get added on this same tag system over time.
+
+## Ready-made tools (`VRItem`)
+
+Some objects are **complete tools we ship whole** — they come with their own model *and* behavior,
+so you place them rather than build them. The kit includes ready-made stand-in actors under
+`Content/VRRealms/Spawnables/`:
+
+- `BP_VRItem_DrawingBoard`, `BP_VRItem_Marker`, `BP_VRItem_Eraser`, `BP_VRItem_SprayCan` (art tools)
+
+Drag one into your level, position/rotate it (the stand-in shows the tool's size + which way it
+faces), and publish. In VR Realms each stand-in is replaced by the **real, working tool** at that
+exact transform. You **can't change these models** (unlike grabbables — these are finished tools);
+you only choose where they go. More tools get added the same way over time.
+
+## Portals — warp to a map or swap avatar (`VRPortal`)
+
+A **portal** is a prop players point at and select to jump to another Workshop map, or to put on a
+Workshop avatar. Like a grabbable you build it from **your own mesh** — but instead of picking it up,
+players select it to travel. Place a **Static Mesh Actor**, set its mesh (a doorway, archway, poster,
+statue, wardrobe mannequin), and add **one** tag:
+
+| Tag | What happens when a player selects it |
+|---|---|
+| `VRPortal.Level.<id>` | Takes them to that Workshop **map** — joining a session already running it if there is one, otherwise hosting it fresh so others can follow. |
+| `VRPortal.Avatar.<id>` | Equips that Workshop **avatar** on them, on the spot. |
+
+`<id>` is the Workshop item's **ID number** — the number after `?id=` in its Steam Workshop web
+address (e.g. `…/filedetails/?id=3829473827` → `VRPortal.Level.3829473827`). Use the ID of a
+**published** item: a map for `Level`, an avatar for `Avatar`.
+
+Notes:
+- The portal is a **fixed** object — it **can't be grabbed, thrown, or knocked around**. Players just
+  aim at it and select. (Under the hood it's a grippable locked to deny-grip + don't-teleport, so it
+  never gets picked up or pulled toward the hand.)
+- The **mesh is the portal's whole look** — make it read like a destination. Build a hub world of
+  doorways into your other maps, or a wardrobe room where statues swap the player's avatar.
+- A **wrong or unpublished `<id>`** simply does nothing when selected — double-check the number.
+- Like grabbables, **you can't test it inside the kit editor** (no VRE here) — publish the map and load
+  it in VR Realms, same as everything else.
+
 ## Golden manifests (developer step)
 
 Validation compares against `Config/GoldenSkeletons/*.txt`, NOT the kit's live skeleton
