@@ -1,8 +1,14 @@
-# VR Realms Creator Kit — v0.3.0 (Alpha, UE 5.8)
+# VR Realms Creator Kit — v0.3.1 (Alpha, UE 5.8)
 
 Build maps and avatars for **VR Realms** and publish them to the Steam Workshop.
 You do **not** need Visual Studio, C++, or the VR Realms source — just Unreal
 Engine 5.8 and a Steam account that has VR Realms in its library.
+
+**New in v0.3.1:** no more surprise **"DataTable Options" import popup** after every
+upload. The kit's per-item save file changed format so the editor no longer tries to
+import it — your saved Workshop IDs carry over automatically, nothing to redo. If you
+ever clicked "Apply" on that old popup, delete the stray `_VRRWorkshop` DataTable asset
+from your item's folder so it doesn't ship inside your pak.
 
 **New in v0.3.0:** the kit moved to **Unreal Engine 5.8** to match the game. Content
 built with this kit requires the UE 5.8 version of VR Realms (and older 5.7 kit
