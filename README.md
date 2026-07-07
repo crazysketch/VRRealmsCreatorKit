@@ -1,8 +1,18 @@
-# VR Realms Creator Kit — v0.3.1 (Alpha, UE 5.8)
+# VR Realms Creator Kit — v0.3.2 (Alpha, UE 5.8)
 
 Build maps and avatars for **VR Realms** and publish them to the Steam Workshop.
 You do **not** need Visual Studio, C++, or the VR Realms source — just Unreal
 Engine 5.8 and a Steam account that has VR Realms in its library.
+
+**New in v0.3.2:** turn an Epic **MetaHuman** into a Workshop avatar in one click —
+now **with hair**. Hair, eyebrows, mustache and beard come across as game-ready hair
+cards, colored from the dye you picked in the MetaHuman editor and tuned to stay sharp
+at a distance; the eyes get a lifelike catchlight. It's **zero-setup** — the avatar
+materials ship inside the kit, no scripts to run. Custom clothing from Fab / the
+marketplace brings its colors across too. And the uploader now catches an **oversized
+preview image** up front (Steam rejects previews of 1 MB or larger) with a clear message
+instead of a cryptic failure after a long upload. Full walkthrough: the **Build an
+Avatar** guide → *MetaHuman avatars*.
 
 **New in v0.3.1:** no more surprise **"DataTable Options" import popup** after every
 upload. The kit's per-item save file changed format so the editor no longer tries to

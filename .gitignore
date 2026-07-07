@@ -36,6 +36,9 @@ KitInternal/
 # --- Author-machine launcher shortcut (ships inside the ZIP, never in git — abs paths) ---
 *.lnk
 
+# --- Dev-only material generator (materials ship as baked .uassets; creators need zero setup) ---
+CreateAvatarBasicMaterial.py
+
 # --- OS / editor junk ---
 Thumbs.db
 desktop.ini

@@ -18,5 +18,11 @@
 			"LoadingPhase": "Default",
 			"PlatformAllowList": [ "Win64" ]
 		}
+	],
+	"Plugins": [
+		{
+			"Name": "HairStrands",
+			"Enabled": true
+		}
 	]
 }
