@@ -119,6 +119,31 @@ Notes:
 - Like grabbables, **you can't test it inside the kit editor** (no VRE here) — publish the map and load
   it in VR Realms, same as everything else.
 
+## Media — TVs & jukeboxes (`VRItem.TV` / `VRItem.Jukebox`)
+
+A shared **video screen** or **audio player / radio** you drop into a map. Place a plain **Static Mesh
+Actor** where it should sit (a cube is fine — it's just a position marker; face it the way the screen
+should point) and add one tag:
+
+| Tag | In VR Realms |
+|---|---|
+| `VRItem.TV` | A networked **video screen** at that spot. |
+| `VRItem.Jukebox` | A networked **audio player / radio** (no screen — great for a club). |
+
+Players set what it plays from a **URL** in VR (the keyboard panel), synced for everyone in the session.
+Works with:
+
+- **TV** — live HLS (`.m3u8`) or a hosted `.mp4` (H.264 video + AAC audio, 1080p).
+- **Jukebox** — internet radio, HLS (`.m3u8`), or a direct `.mp3` / `.aac` link.
+
+Notes:
+- **No YouTube page links** — a `youtube.com/…` URL isn't a direct stream and won't play. Use a direct
+  media URL (internet radio, an `.m3u8`, or a file you host).
+- Like the ready-made tools, **the screen/speaker model is ours** — your tagged mesh only sets position
+  and facing (it's replaced in-game). Broadcast only video/music you **have the rights to**.
+- A **live** stream stays in sync for everyone automatically; a plain file starts from the beginning for
+  each viewer (perfect for radio and live shows).
+
 ## Golden manifests (developer step)
 
 Validation compares against `Config/GoldenSkeletons/*.txt`, NOT the kit's live skeleton

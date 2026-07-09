@@ -1,8 +1,15 @@
-# VR Realms Creator Kit — v0.3.2 (Alpha, UE 5.8)
+# VR Realms Creator Kit — v0.3.3 (Alpha, UE 5.8)
 
 Build maps and avatars for **VR Realms** and publish them to the Steam Workshop.
 You do **not** need Visual Studio, C++, or the VR Realms source — just Unreal
 Engine 5.8 and a Steam account that has VR Realms in its library.
+
+**New in v0.3.3:** drop a shared **TV screen** or **jukebox / radio** into any map with a
+single tag — `VRItem.TV` (video) or `VRItem.Jukebox` (audio). Players set what it plays from
+a **URL** live in VR (a live HLS `.m3u8`, a hosted `.mp4`, internet radio, or an `.mp3`), and
+it's synced for everyone in the session — perfect for a club dance floor or a movie room. See
+*Interactables → Media* below. Direct media links only (no YouTube pages), and broadcast only
+content you have the rights to.
 
 **New in v0.3.2:** turn an Epic **MetaHuman** into a Workshop avatar in one click —
 now **with hair**. Hair, eyebrows, mustache and beard come across as game-ready hair
