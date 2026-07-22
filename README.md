@@ -1,8 +1,17 @@
-# VR Realms Creator Kit — v0.3.3 (Alpha, UE 5.8)
+# VR Realms Creator Kit — v0.3.4 (Alpha, UE 5.8)
 
 Build maps and avatars for **VR Realms** and publish them to the Steam Workshop.
 You do **not** need Visual Studio, C++, or the VR Realms source — just Unreal
 Engine 5.8 and a Steam account that has VR Realms in its library.
+
+**New in v0.3.4:** your builds are now **compressed** (Oodle Kraken, distribution
+grade) — the same map typically packs **25–40% smaller**, so players download your
+world faster and you're far less likely to hit the 700 MB size cap. Nothing to
+configure: just Build as usual (the log shows a `Compression:` line). Existing
+uploads keep working; rebuild + update your item to get the smaller size. If
+you're near the cap even after this, the real lever is texture size — select your
+textures → right-click → Asset Actions → Bulk Edit → set **Maximum Texture Size**
+to 1024 (4K textures can't be resolved in VR anyway).
 
 **New in v0.3.3:** drop a shared **TV screen** or **jukebox / radio** into any map with a
 single tag — `VRItem.TV` (video) or `VRItem.Jukebox` (audio). Players set what it plays from
