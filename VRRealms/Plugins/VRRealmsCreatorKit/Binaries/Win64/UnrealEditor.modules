@@ -2,6 +2,7 @@
 	"BuildId": "55116800",
 	"Modules": 
 	{
+		"VRRealmsAPI": "UnrealEditor-VRRealmsAPI.dll",
 		"VRRealmsCreatorKit": "UnrealEditor-VRRealmsCreatorKit.dll"
 	}
 }

@@ -17,6 +17,12 @@
 			"Type": "Editor",
 			"LoadingPhase": "Default",
 			"PlatformAllowList": [ "Win64" ]
+		},
+		{
+			"_comment": "RUNTIME module (2026-07-29) — the creator-facing scripting API. Separate from the Editor module above because a creator's cooked Workshop pak must be able to CALL these nodes at runtime, and an Editor module is stripped. Deliberately tiny and dependency-free: it declares an interface plus a Blueprint function library and links NOTHING but Core/CoreUObject/Engine, so it compiles in the content-only kit which has no VRE and no game module. Everything VR-specific lives behind the interface, implemented game-side.",
+			"Name": "VRRealmsAPI",
+			"Type": "Runtime",
+			"LoadingPhase": "Default"
 		}
 	],
 	"Plugins": [

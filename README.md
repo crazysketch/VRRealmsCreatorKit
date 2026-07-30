@@ -1,8 +1,34 @@
-# VR Realms Creator Kit — v0.3.4 (Alpha, UE 5.8)
+# VR Realms Creator Kit — v0.4.0 (Alpha, UE 5.8)
 
 Build maps and avatars for **VR Realms** and publish them to the Steam Workshop.
 You do **not** need Visual Studio, C++, or the VR Realms source — just Unreal
 Engine 5.8 and a Steam account that has VR Realms in its library.
+
+**New in v0.4.0 — you don't need to look up tags any more.** Drag
+`VRRealms/Items/BP_VRItemMarker` into your level and pick what it should be from the
+**Item** dropdown in *Details → VR Realms*: a video screen, a surface screen, a
+jukebox, a drawing board, a marker, an eraser, a spray can, a mirror, a button, a
+rifle or pistol pad, and a **drivable car**. The placeholder immediately reshapes
+itself to that item's real size and draws an arrow showing **which way it faces**,
+so you can lay a room out around true dimensions and see at a glance that your
+screen points into the room and not into a wall. The same panel holds the grab
+options, the media URL and the sound range.
+
+Three more dropdowns landed with it: **Game mode** (deathmatch or team deathmatch,
+with sliders for score, health and damage), **Match role** (respawn points and
+scoreboards), and **Movement mode** (force a locomotion style inside a Trigger Box —
+climbing walls, running trails). And a **Scripting API**: a handful of Blueprint
+nodes that hand you the VR player — their hands, their head, whether they're
+gripping, the nearest player to a point — so you can attach a prop to someone's
+hand or build your own vehicle, with no plugins in your project.
+
+Two long-standing bugs went out with it: a tagged TV spawned an invisible screen
+that never played anything, and tagging your own boombox as a jukebox deleted your
+model — now your mesh stays and becomes the thing playing.
+
+**Typing tags still works exactly as before.** Nothing you have already published
+needs changing; the dropdowns write the same Actor Tags by hand. Full docs:
+<https://vr-realms.com/interactables.php>
 
 **New in v0.3.4:** your builds are now **compressed** (Oodle Kraken, distribution
 grade) — the same map typically packs **25–40% smaller**, so players download your
