@@ -1,8 +1,31 @@
-# VR Realms Creator Kit — v0.4.0 (Alpha, UE 5.8)
+# VR Realms Creator Kit — v0.4.5 (Alpha, UE 5.8)
 
 Build maps and avatars for **VR Realms** and publish them to the Steam Workshop.
 You do **not** need Visual Studio, C++, or the VR Realms source — just Unreal
 Engine 5.8 and a Steam account that has VR Realms in its library.
+
+**New in v0.4.5 — your map can be an actual game now.** A new **Game device**
+dropdown in *Details → VR Realms* turns any actor into one of four things. A
+**Scoring zone** fires when a player or a ball enters it, and you say how many
+points that is worth. A **Ball home** is where a ball comes back to — stopped
+dead and ready to grab. **Round rules** decide what it takes to win: a score, a
+clock, teams or not. And the **scoreboard** now renders any of it, not just kills.
+
+The part that ties them together is **channels**. Any device can *announce* a
+name when it fires, and anything else can be told to *react to* that name. A goal
+zone announces `Ball`; the ball's home reacts to `Ball`. So does a light, if you
+want one. There is no scripting language and no graph to wire — you type a name
+in two boxes and they are connected.
+
+That is enough for **volleyball, soccer and a lap race** today. The guide at
+[vr-realms.com/game-modes.php](https://vr-realms.com/game-modes.php) walks through
+all three with diagrams; the volleyball one takes about five minutes.
+
+The Workshop build check got smarter too, because most of the ways this goes
+wrong are silent. It now refuses to build a map with two sets of round rules, and
+warns you when something reacts to a name nothing announces, when a ball has no
+home to return to, or when a map scores points but nobody can ever win. Those
+used to be things you only discovered by publishing and playing.
 
 **New in v0.4.0 — you don't need to look up tags any more.** Drag
 `VRRealms/Items/BP_VRItemMarker` into your level and pick what it should be from the
