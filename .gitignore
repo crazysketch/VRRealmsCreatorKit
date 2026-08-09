@@ -15,7 +15,16 @@ VRRealms/.vs/
 VRRealms/*.sln
 
 # --- Shipped tool binaries (distributed via GitHub Releases, not git) ---
-Tools/
+# ⚠ `Tools/*` WITH THE STAR, NOT `Tools/`. Git never descends into a directory
+#   excluded by name, so a later `!Tools/*.ps1` would be silently ignored and the
+#   VRR Creator scripts would never be committed — a fresh clone would have no
+#   updater at all. Excluding the CONTENTS instead leaves the directory visible,
+#   which is what makes the negation below work.
+Tools/*
+!Tools/*.ps1
+
+# --- Build output of Tools\New-KitRelease.ps1 (uploaded to a Release, not git) ---
+_release/
 
 # --- WorkshopTool runtime/user state (must never ship) ---
 **/workshop_tool_settings.json

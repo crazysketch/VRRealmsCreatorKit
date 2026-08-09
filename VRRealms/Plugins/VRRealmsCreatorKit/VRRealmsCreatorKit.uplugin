@@ -1,7 +1,8 @@
 {
 	"FileVersion": 3,
-	"Version": 1,
-	"VersionName": "1.0",
+	"_comment_version": "⚠ VersionName IS THE UPDATER'S SOURCE OF TRUTH. Update-Kit.cmd reads it to decide whether a creator is out of date, so it MUST be bumped on every release and MUST match the README heading. It read '1.0' while the kit shipped 0.4.6, which is why the updater could not exist until now. Keep it Major.Minor.Patch — the script parses it as a version, not a string.",
+	"Version": 5,
+	"VersionName": "0.4.6",
 	"FriendlyName": "VR Realms Creator Kit",
 	"Description": "In-editor Steam Workshop pipeline for VR Realms: validate avatars against the shipped skeletons, auto-fix bone-extended rigs, cook, pak and upload. Tools menu > VR Realms Workshop.",
 	"Category": "VR Realms",

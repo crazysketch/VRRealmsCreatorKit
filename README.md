@@ -1,8 +1,33 @@
-# VR Realms Creator Kit — v0.4.5 (Alpha, UE 5.8)
+# VR Realms Creator Kit — v0.4.6 (Alpha, UE 5.8)
 
 Build maps and avatars for **VR Realms** and publish them to the Steam Workshop.
 You do **not** need Visual Studio, C++, or the VR Realms source — just Unreal
 Engine 5.8 and a Steam account that has VR Realms in its library.
+
+**New in v0.4.6 — scoring zones now actually see the ball.** The first real
+playtest of the game devices turned up three things, and none of them was
+anything you did wrong.
+
+**Zones could not detect a ball at all.** They saw players and nothing else — so
+floor goals only scored when somebody walked on them, team scores sat at 0-0 all
+match, and an out-of-bounds box never fired once no matter how you drew it. Fixed
+in the game, so **your existing map just starts working**; nothing to re-place.
+
+**A new "Triggered by" dropdown** on the Scoring zone: *Anything*, *Players only*,
+or *The ball / objects only*. Pick the last one for a goal or an out-of-bounds
+box and players can walk through it freely without setting it off. If you already
+chose a team under "Scores for", that is assumed — a goal a player can walk into
+and score isn't a goal.
+
+**Standing on the edge of a zone no longer machine-guns points.** A body resting
+right on the boundary flickers in and out of it every frame, and each flicker used
+to be worth a point (a real match ended up handing out 22 points in a third of a
+second). Zones now refuse to re-fire that fast, whatever the Cooldown says.
+
+**Balls play like balls, and clients can hold them.** Hit power went up and balls
+now have drag, so a spike travels instead of vanishing and you can still get under
+it. And a player who *joined* your world — rather than hosting it — can finally
+keep hold of a grabbed ball instead of it popping out of their hands.
 
 **New in v0.4.5 — your map can be an actual game now.** A new **Game device**
 dropdown in *Details → VR Realms* turns any actor into one of four things. A
