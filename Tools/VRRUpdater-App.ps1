@@ -42,32 +42,97 @@ function Test-AllowedEntry($name) {
     if ($name -eq  'VRRUpdater.cmd')                        { return $true }
     if ($name -like 'Tools/*.ps1')                          { return $true }
     return $false
-}# ⚠⚠ FIND THE KIT, DO NOT DEMAND A LOCATION. Walk UP from wherever this script sits
-# until a folder has VRRealms\Plugins\VRRealmsCreatorKit\*.uplugin inside it.
+}# ⚠⚠ FIND THE KIT. TWO STRATEGIES, THEN SAY WHAT WAS TRIED.
 #
-# The old code assumed the kit root was exactly one level up. Three placement failures
-# from the first two humans who tried it - inside VRRealms\, one level too high, and
-# inside the PLUGIN folder itself - say the assumption was the bug, not the users.
-# It is genuinely confusing terrain: TWO folders are called VRRealmsCreatorKit (the kit
-# root, and the plugin inside it), so "put it in VRRealmsCreatorKit" is ambiguous even
-# when read carefully. Searching removes the question entirely - drop the tool anywhere
-# in the kit and it works.
+# Strategy 1 walks UP looking for the exact layout VRRealms\Plugins\VRRealmsCreatorKit.
+# Strategy 2 exists because strategy 1 assumed that layout and a real creator's kit did
+# not match it - the search found nothing anywhere above the tool and the failure said
+# only "kit not found", which is unactionable from a screenshot. So we also search DOWN
+# for the .uplugin by name, and on failure we REPORT EVERY FOLDER WE LOOKED IN.
+#
+# 💡 The rule this encodes: when a tool cannot find something, the error must name where
+# it looked. "Not found" costs a round trip every single time; "not found, I checked
+# these five folders" is usually self-diagnosing.
+$script:KitSearchLog = New-Object System.Collections.ArrayList
+
+# Extract without Expand-Archive: its -DestinationPath has no literal variant, so a kit
+# under D:\[Brackets]\ fails with "an item with the specified name ... already exists".
+# Entry-by-entry with overwrite is also idempotent, which a retry needs.
+function Expand-Zip($zipPath, $destRoot) {
+    $zip = [IO.Compression.ZipFile]::OpenRead($zipPath)
+    try {
+        foreach ($entry in $zip.Entries) {
+            if (-not $entry.Name) { continue }                  # directory marker
+            $rel    = $entry.FullName.Replace([char]47, [char]92)
+            $target = Join-Path $destRoot $rel
+            [void][IO.Directory]::CreateDirectory((Split-Path $target -Parent))
+            [IO.Compression.ZipFileExtensions]::ExtractToFile($entry, $target, $true)
+        }
+    } finally { $zip.Dispose() }
+}
+# Recursive directory copy that is immune to wildcard characters in paths.
+function Copy-Tree($src, $dst) {
+    [void][IO.Directory]::CreateDirectory($dst)
+    foreach ($d in [IO.Directory]::GetDirectories($src, '*', 'AllDirectories')) {
+        [void][IO.Directory]::CreateDirectory((Join-Path $dst $d.Substring($src.Length).TrimStart('\')))
+    }
+    foreach ($f in [IO.Directory]::GetFiles($src, '*', 'AllDirectories')) {
+        [IO.File]::Copy($f, (Join-Path $dst $f.Substring($src.Length).TrimStart('\')), $true)
+    }
+}
+
 function Find-KitRoot($startDir) {
+    $ancestors = New-Object System.Collections.ArrayList
     $dir = $startDir
     for ($i = 0; $i -lt 8 -and $dir; $i++) {
+        [void]$ancestors.Add($dir)
         $probe = Join-Path $dir 'VRRealms\Plugins\VRRealmsCreatorKit\VRRealmsCreatorKit.uplugin'
-        if (Test-Path $probe) { return $dir }
+        [void]$script:KitSearchLog.Add("looked for VRRealms\Plugins\... under: $dir")
+        if (Test-Path -LiteralPath $probe) { $script:FoundPluginDir = (Split-Path $probe -Parent); return $dir }
         $parent = Split-Path -Parent $dir
-        if ($parent -eq $dir) { break }      # reached the drive root
+        if ($parent -eq $dir) { break }
         $dir = $parent
     }
-    # Nothing found anywhere above us. Fall back to the old assumption so the
-    # friendly "kit not found" message downstream still prints a sensible path
-    # instead of the script dying on a null in Join-Path.
-    return (Split-Path -Parent $startDir)
+
+    # Nothing in the expected shape. Hunt for the .uplugin by NAME instead - the kit may
+    # be nested differently, or the project folder may not be called VRRealms at all.
+    # ⚠⚠ BOUNDED. NEVER RECURSE FROM A DRIVE ROOT.
+    # The first version searched every ancestor to depth 5 - and the ancestor list runs
+    # all the way up to D:\, so it recursively scanned an entire drive. It never crashed;
+    # it just ground away for minutes with no window on screen, which reads as frozen.
+    # Only the nearest 3 ancestors, only depth 3, and anything that looks like a drive
+    # root is skipped outright. A real kit is always within a couple of folders of the tool.
+    foreach ($anc in ($ancestors | Select-Object -First 3)) {
+        if ($anc.Length -le 3) {
+            [void]$script:KitSearchLog.Add("skipped drive root (too broad to search): $anc")
+            continue
+        }
+        [void]$script:KitSearchLog.Add("searched for VRRealmsCreatorKit.uplugin under: $anc")
+        # ⚠ SKIP OUR OWN BACKUPS. Every install leaves _VRRUpdaterBackup_<version>\ behind,
+        # and that folder contains a copy of VRRealmsCreatorKit.uplugin - the exact filename
+        # this search hunts for. Without this filter the tool can "find" a kit inside its own
+        # backup and then install into the wrong place. A tool's leftovers must never look
+        # like the thing it is searching for.
+        $hit = Get-ChildItem -LiteralPath $anc -Filter 'VRRealmsCreatorKit.uplugin' -Recurse -Depth 3 -File -ErrorAction SilentlyContinue |
+               Where-Object { $_.FullName -notlike '*_VRRUpdaterBackup_*' } |
+               Select-Object -First 1
+        if ($hit) {
+            # <root>\<project>\Plugins\VRRealmsCreatorKit\VRRealmsCreatorKit.uplugin -> up 3
+            $root = Split-Path (Split-Path (Split-Path $hit.DirectoryName -Parent) -Parent) -Parent
+            [void]$script:KitSearchLog.Add("FOUND plugin at: $($hit.FullName)")
+            [void]$script:KitSearchLog.Add("deduced kit root: $root")
+            $script:FoundPluginDir = $hit.DirectoryName
+            if ($root -and (Test-Path -LiteralPath $root)) { return $root }
+        }
+    }
+    return $null
 }
-$KitRoot        = $(Find-KitRoot $PSScriptRoot)
-$PluginDir      = Join-Path $KitRoot 'VRRealms\Plugins\VRRealmsCreatorKit'
+$KitRoot        = Find-KitRoot $PSScriptRoot
+# No kit anywhere. Fall back to the old assumption so the FRIENDLY 'kit not found'
+# message (with its list of folders checked) still prints, instead of the script dying
+# on a null inside Join-Path and leaving the user staring at a raw PowerShell error.
+if (-not $KitRoot) { $KitRoot = Split-Path -Parent $PSScriptRoot }
+$PluginDir      = if ($script:FoundPluginDir) { $script:FoundPluginDir } else { Join-Path $KitRoot 'VRRealms\Plugins\VRRealmsCreatorKit' }
 $UPluginPath    = Join-Path $PluginDir 'VRRealmsCreatorKit.uplugin'
 $ContentVerPath = Join-Path $KitRoot '.kit-content-version'
 $Headers        = @{ 'User-Agent' = 'VRRUpdater' }
@@ -91,7 +156,7 @@ $Headers        = @{ 'User-Agent' = 'VRRUpdater' }
 
     <StackPanel Grid.Row="0" Margin="0,0,0,12">
       <TextBlock Text="VRR UPDATER" FontSize="24" FontWeight="Bold" Foreground="#FF35D0E8"/>
-      <TextBlock Text="VR Realms Creator Kit manager" FontSize="12" Foreground="#FF8A96A6"/>
+      <TextBlock Text="VR Realms Creator Kit manager  |  build 2026-08-08.9" FontSize="12" Foreground="#FF8A96A6"/>
     </StackPanel>
 
     <Border Grid.Row="1" Background="#FF1E232B" CornerRadius="6" Padding="12" Margin="0,0,0,12">
@@ -144,9 +209,9 @@ function Set-Status($text, $colour = '#FF8A96A6') {
 }
 
 function Get-LocalVersion {
-    if (-not (Test-Path $UPluginPath)) { return $null }
+    if (-not (Test-Path -LiteralPath $UPluginPath)) { return $null }
     try {
-        $v = (Get-Content $UPluginPath -Raw | ConvertFrom-Json).VersionName
+        $v = (Get-Content -LiteralPath $UPluginPath -Raw | ConvertFrom-Json).VersionName
         # Kits published before version tracking all claim "1.0", which parses as
         # NEWER than 0.4.6 and would mark everyone permanently up to date.
         if ($v -eq '1.0') { return '0.0.0' }
@@ -167,9 +232,16 @@ $script:Releases = @()
 function Refresh-Releases {
     $local = Get-LocalVersion
     if (-not $local) {
-        $TxtInstalled.Text = "Kit not found — keep VRR Updater in the folder that contains 'VRRealms'."
+        $TxtInstalled.Text = "Kit not found (build 2026-08-08.9). Put VRRUpdater.cmd anywhere inside your Creator Kit."
         $TxtPath.Text = $UPluginPath
-        Set-Status "Cannot continue until the kit is found." '#FFE8615F'
+        # Show EVERY folder we looked in. "Not found" alone costs a support round trip;
+        # the list is usually enough for the creator to spot the problem themselves.
+        $rows = New-Object System.Collections.ArrayList
+        foreach ($line in $script:KitSearchLog) {
+            [void]$rows.Add([pscustomobject]@{ Version=''; Published=''; Status='searched'; Summary=$line })
+        }
+        $LstReleases.ItemsSource = $rows
+        Set-Status "Cannot continue until the kit is found. The rows above list every folder checked - send this screenshot." '#FFE8615F'
         return
     }
     $TxtInstalled.Text = "Installed tools: $local"
@@ -264,13 +336,18 @@ function Install-Release($entry) {
                 }
             }
         } finally { $archive.Dispose() }
-
-        $backupDir = Join-Path $KitRoot ("_VRRUpdaterBackup_" + $local)
-        if (Test-Path $backupDir) { Remove-Item $backupDir -Recurse -Force }
-        Copy-Item $PluginDir $backupDir -Recurse -Force
+        # ⚠ UNIQUE BACKUP FOLDER, AND A .NET COPY.
+        # Copy-Item -Recurse REFUSES when the destination already exists ("an item with the
+        # specified name ... already exists"), which is exactly what happens on a second
+        # attempt after any earlier failure - the install then blocks forever on the debris
+        # of the run before it. A timestamped name cannot collide, so no delete is needed,
+        # and the old backup stays around as extra safety rather than being destroyed.
+        # .NET rather than Copy-Item because these paths may contain [square brackets].
+        $backupDir = Join-Path $KitRoot ("_VRRUpdaterBackup_" + $local + "_" + (Get-Date -Format 'MMdd-HHmmss'))
+        Copy-Tree $PluginDir $backupDir
 
         Set-Status "Installing..."
-        Expand-Archive -Path $zipPath -DestinationPath $KitRoot -Force
+        Expand-Zip $zipPath $KitRoot
 
         $now = Get-LocalVersion
         Set-Status "Installed $now. Your previous tools are in _VRRUpdaterBackup_$local. Reopen your project to use them." '#FF6FD07A'
@@ -280,7 +357,7 @@ function Install-Release($entry) {
         Set-Status "Install failed: $($_.Exception.Message). Your existing tools were left alone." '#FFE8615F'
     }
     finally {
-        if (Test-Path $tmpDir) { Remove-Item $tmpDir -Recurse -Force -ErrorAction SilentlyContinue }
+        if (Test-Path -LiteralPath $tmpDir) { Remove-Item -LiteralPath $tmpDir -Recurse -Force -ErrorAction SilentlyContinue }
     }
 }
 
