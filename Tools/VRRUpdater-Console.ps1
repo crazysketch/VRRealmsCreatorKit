@@ -1,5 +1,5 @@
 ﻿<#
-    VRR CREATOR — Creator Kit updater
+    VRR UPDATER — Creator Kit updater
     ---------------------------------------------------------------------------
     Reads the kit's installed version, asks GitHub what the latest release is,
     and swaps in the new TOOLS if they differ.
@@ -19,9 +19,9 @@
       3. It refuses to run while Unreal is open, because the plugin DLL is
          locked and a half-written plugin folder is worse than an old one.
 
-    Usage:  VRRCreator.cmd            check, then ask before installing
-            VRRCreator.cmd -Check     report only, never install
-            VRRCreator.cmd -Force     reinstall even if versions match
+    Usage:  VRRUpdater.cmd            check, then ask before installing
+            VRRUpdater.cmd -Check     report only, never install
+            VRRUpdater.cmd -Force     reinstall even if versions match
 #>
 
 [CmdletBinding()]
@@ -39,7 +39,41 @@ $ErrorActionPreference = 'Stop'
 
 $Repo         = 'crazysketch/VRRealmsCreatorKit'
 $SafePrefix   = 'VRRealms/Plugins/VRRealmsCreatorKit/'
-$KitRoot      = Split-Path -Parent $PSScriptRoot
+
+# The package may also carry VRR Updater ITSELF, so the updater can update itself.
+# EXPLICIT ALLOWLIST, not a widened prefix: the kit plugin folder, plus exactly two
+# tool paths at the kit root. Anything else - above all Content\VRRealms\Community,
+# where a creator's own maps live - is still refused outright.
+function Test-AllowedEntry($name) {
+    if ($name -like 'VRRealms/Plugins/VRRealmsCreatorKit/*') { return $true }
+    if ($name -eq  'VRRUpdater.cmd')                        { return $true }
+    if ($name -like 'Tools/*.ps1')                          { return $true }
+    return $false
+}# ⚠⚠ FIND THE KIT, DO NOT DEMAND A LOCATION. Walk UP from wherever this script sits
+# until a folder has VRRealms\Plugins\VRRealmsCreatorKit\*.uplugin inside it.
+#
+# The old code assumed the kit root was exactly one level up. Three placement failures
+# from the first two humans who tried it - inside VRRealms\, one level too high, and
+# inside the PLUGIN folder itself - say the assumption was the bug, not the users.
+# It is genuinely confusing terrain: TWO folders are called VRRealmsCreatorKit (the kit
+# root, and the plugin inside it), so "put it in VRRealmsCreatorKit" is ambiguous even
+# when read carefully. Searching removes the question entirely - drop the tool anywhere
+# in the kit and it works.
+function Find-KitRoot($startDir) {
+    $dir = $startDir
+    for ($i = 0; $i -lt 8 -and $dir; $i++) {
+        $probe = Join-Path $dir 'VRRealms\Plugins\VRRealmsCreatorKit\VRRealmsCreatorKit.uplugin'
+        if (Test-Path $probe) { return $dir }
+        $parent = Split-Path -Parent $dir
+        if ($parent -eq $dir) { break }      # reached the drive root
+        $dir = $parent
+    }
+    # Nothing found anywhere above us. Fall back to the old assumption so the
+    # friendly "kit not found" message downstream still prints a sensible path
+    # instead of the script dying on a null in Join-Path.
+    return (Split-Path -Parent $startDir)
+}
+$KitRoot      = $(Find-KitRoot $PSScriptRoot)
 $PluginDir    = Join-Path $KitRoot 'VRRealms\Plugins\VRRealmsCreatorKit'
 $UPluginPath  = Join-Path $PluginDir 'VRRealmsCreatorKit.uplugin'
 $ContentVerPath = Join-Path $KitRoot '.kit-content-version'
@@ -51,7 +85,7 @@ function Write-Bad($text)  { Write-Host "  $text" -ForegroundColor Red }
 
 Write-Host ""
 Write-Host "  ================================================" -ForegroundColor DarkCyan
-Write-Host "   VRR CREATOR  -  VR Realms Creator Kit updater" -ForegroundColor White
+Write-Host "   VRR UPDATER  -  VR Realms Creator Kit updater" -ForegroundColor White
 Write-Host "  ================================================" -ForegroundColor DarkCyan
 
 # ---------------------------------------------------------------------------
@@ -61,7 +95,7 @@ if (-not (Test-Path $UPluginPath)) {
     Write-Bad "Could not find the kit plugin at:"
     Write-Bad "  $UPluginPath"
     Write-Host ""
-    Write-Host "  Keep VRRCreator.cmd in the folder that contains 'VRRealms'. If you moved it,"
+    Write-Host "  Keep VRRUpdater.cmd in the folder that contains 'VRRealms'. If you moved it,"
     Write-Host "  move it back rather than running it from somewhere else."
     exit 2
 }
@@ -90,7 +124,7 @@ Write-Head "Checking for updates..."
 try {
     # The API rejects requests with no User-Agent. Anonymous is fine: public repo.
     $release = Invoke-RestMethod -Uri "https://api.github.com/repos/$Repo/releases/latest" `
-                                 -Headers @{ 'User-Agent' = 'VRRCreator' } -TimeoutSec 30
+                                 -Headers @{ 'User-Agent' = 'VRRUpdater' } -TimeoutSec 30
 } catch {
     Write-Bad "Could not reach GitHub."
     Write-Host "  $($_.Exception.Message)"
@@ -139,7 +173,7 @@ $manifestAsset = $release.assets | Where-Object { $_.name -eq 'manifest.json' } 
 if ($manifestAsset) {
     try {
         $manifest = Invoke-RestMethod -Uri $manifestAsset.browser_download_url `
-                                      -Headers @{ 'User-Agent' = 'VRRCreator' } -TimeoutSec 30
+                                      -Headers @{ 'User-Agent' = 'VRRUpdater' } -TimeoutSec 30
     } catch {
         $manifest = $null   # not fatal: the plugin update can still proceed
     }
@@ -187,7 +221,7 @@ if ($Check) {
 $asset = $release.assets | Where-Object { $_.name -like '*plugin*.zip' } | Select-Object -First 1
 if (-not $asset) {
     Write-Host ""
-    Write-Bad "This release has no plugin zip attached, so VRR Creator cannot patch it."
+    Write-Bad "This release has no plugin zip attached, so VRR Updater cannot patch it."
     Write-Host "  Download the full kit instead: https://github.com/$Repo/releases/latest"
     exit 4
 }
@@ -206,7 +240,7 @@ if ($answer -and $answer.Trim().ToLower() -notin @('y','yes')) {
 $ue = Get-Process -Name 'UnrealEditor' -ErrorAction SilentlyContinue
 if ($ue) {
     Write-Host ""
-    Write-Bad "Unreal Editor is running. Close it and run VRR Creator again."
+    Write-Bad "Unreal Editor is running. Close it and run VRR Updater again."
     Write-Host "  (The kit's plugin file is locked while the editor is open.)"
     exit 5
 }
@@ -214,14 +248,14 @@ if ($ue) {
 # ---------------------------------------------------------------------------
 # 6. Download + verify
 # ---------------------------------------------------------------------------
-$tmpDir = Join-Path $env:TEMP ("VRRCreator_" + [guid]::NewGuid().ToString('N'))
+$tmpDir = Join-Path $env:TEMP ("VRRUpdater_" + [guid]::NewGuid().ToString('N'))
 New-Item -ItemType Directory -Path $tmpDir -Force | Out-Null
 $zipPath = Join-Path $tmpDir $asset.name
 
 try {
     Write-Head "Downloading $($asset.name) ($([math]::Round($asset.size / 1MB, 2)) MB)..."
     Invoke-WebRequest -Uri $asset.browser_download_url -OutFile $zipPath -UseBasicParsing `
-                      -Headers @{ 'User-Agent' = 'VRRCreator' } -TimeoutSec 300
+                      -Headers @{ 'User-Agent' = 'VRRUpdater' } -TimeoutSec 300
 
     if ($manifest -and $manifest.pluginSha256) {
         $got = (Get-FileHash -Path $zipPath -Algorithm SHA256).Hash
@@ -242,7 +276,7 @@ try {
     try {
         foreach ($entry in $archive.Entries) {
             $name = $entry.FullName -replace '\\', '/'
-            if ($name -notlike "$SafePrefix*") {
+            if (-not (Test-AllowedEntry $name)) {
                 Write-Bad "This package tries to write outside the kit plugin folder:"
                 Write-Bad "  $name"
                 Write-Host "  Refusing to install. Nothing was changed."
@@ -257,10 +291,10 @@ try {
     # -----------------------------------------------------------------------
     # 7. Back up, then install
     # -----------------------------------------------------------------------
-    $backupDir = Join-Path $KitRoot ("_VRRCreatorBackup_" + $localVersion)
+    $backupDir = Join-Path $KitRoot ("_VRRUpdaterBackup_" + $localVersion)
     if (Test-Path $backupDir) { Remove-Item $backupDir -Recurse -Force }
     Copy-Item $PluginDir $backupDir -Recurse -Force
-    Write-Ok "Backed up your current tools to _VRRCreatorBackup_$localVersion"
+    Write-Ok "Backed up your current tools to _VRRUpdaterBackup_$localVersion"
 
     Expand-Archive -Path $zipPath -DestinationPath $KitRoot -Force
 
@@ -274,7 +308,7 @@ try {
     Write-Ok "Updated to $newVersion."
     Write-Host ""
     Write-Host "  Open your project again and the new tools are live."
-    Write-Host "  If anything looks wrong, your old tools are in _VRRCreatorBackup_$localVersion"
+    Write-Host "  If anything looks wrong, your old tools are in _VRRUpdaterBackup_$localVersion"
     exit 0
 }
 catch {

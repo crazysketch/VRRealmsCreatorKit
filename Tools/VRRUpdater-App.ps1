@@ -1,5 +1,5 @@
 ﻿<#
-    VRR CREATOR — Creator Kit manager (window)
+    VRR UPDATER — Creator Kit manager (window)
     ---------------------------------------------------------------------------
     Lists every published kit release, shows which one you have, and installs
     the one you pick. Same job as VRChat's Creator Companion, scoped to the
@@ -13,7 +13,7 @@
       step, zero dependencies, and no scary dialog. If it ever outgrows that,
       the install logic below ports to C# unchanged.
 
-    THE THREE RULES (identical to VRRCreator-Update.ps1 — keep them in sync)
+    THE THREE RULES (identical to VRRUpdater-Console.ps1 — keep them in sync)
       1. Only ever writes inside VRRealms\Plugins\VRRealmsCreatorKit\. Every zip
          entry is checked against that prefix BEFORE extracting anything.
       2. NO credentials, ever. Public repo, anonymous reads. This ships to
@@ -32,11 +32,45 @@ Add-Type -AssemblyName System.IO.Compression.FileSystem
 
 $Repo           = 'crazysketch/VRRealmsCreatorKit'
 $SafePrefix     = 'VRRealms/Plugins/VRRealmsCreatorKit/'
-$KitRoot        = Split-Path -Parent $PSScriptRoot
+
+# The package may also carry VRR Updater ITSELF, so the updater can update itself.
+# EXPLICIT ALLOWLIST, not a widened prefix: the kit plugin folder, plus exactly two
+# tool paths at the kit root. Anything else - above all Content\VRRealms\Community,
+# where a creator's own maps live - is still refused outright.
+function Test-AllowedEntry($name) {
+    if ($name -like 'VRRealms/Plugins/VRRealmsCreatorKit/*') { return $true }
+    if ($name -eq  'VRRUpdater.cmd')                        { return $true }
+    if ($name -like 'Tools/*.ps1')                          { return $true }
+    return $false
+}# ⚠⚠ FIND THE KIT, DO NOT DEMAND A LOCATION. Walk UP from wherever this script sits
+# until a folder has VRRealms\Plugins\VRRealmsCreatorKit\*.uplugin inside it.
+#
+# The old code assumed the kit root was exactly one level up. Three placement failures
+# from the first two humans who tried it - inside VRRealms\, one level too high, and
+# inside the PLUGIN folder itself - say the assumption was the bug, not the users.
+# It is genuinely confusing terrain: TWO folders are called VRRealmsCreatorKit (the kit
+# root, and the plugin inside it), so "put it in VRRealmsCreatorKit" is ambiguous even
+# when read carefully. Searching removes the question entirely - drop the tool anywhere
+# in the kit and it works.
+function Find-KitRoot($startDir) {
+    $dir = $startDir
+    for ($i = 0; $i -lt 8 -and $dir; $i++) {
+        $probe = Join-Path $dir 'VRRealms\Plugins\VRRealmsCreatorKit\VRRealmsCreatorKit.uplugin'
+        if (Test-Path $probe) { return $dir }
+        $parent = Split-Path -Parent $dir
+        if ($parent -eq $dir) { break }      # reached the drive root
+        $dir = $parent
+    }
+    # Nothing found anywhere above us. Fall back to the old assumption so the
+    # friendly "kit not found" message downstream still prints a sensible path
+    # instead of the script dying on a null in Join-Path.
+    return (Split-Path -Parent $startDir)
+}
+$KitRoot        = $(Find-KitRoot $PSScriptRoot)
 $PluginDir      = Join-Path $KitRoot 'VRRealms\Plugins\VRRealmsCreatorKit'
 $UPluginPath    = Join-Path $PluginDir 'VRRealmsCreatorKit.uplugin'
 $ContentVerPath = Join-Path $KitRoot '.kit-content-version'
-$Headers        = @{ 'User-Agent' = 'VRRCreator' }
+$Headers        = @{ 'User-Agent' = 'VRRUpdater' }
 
 # ---------------------------------------------------------------------------
 # Window
@@ -44,7 +78,7 @@ $Headers        = @{ 'User-Agent' = 'VRRCreator' }
 [xml]$xaml = @"
 <Window xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="VRR Creator" Height="560" Width="760"
+        Title="VRR Updater" Height="560" Width="760"
         WindowStartupLocation="CenterScreen" Background="#FF15181D">
   <Grid Margin="16">
     <Grid.RowDefinitions>
@@ -56,7 +90,7 @@ $Headers        = @{ 'User-Agent' = 'VRRCreator' }
     </Grid.RowDefinitions>
 
     <StackPanel Grid.Row="0" Margin="0,0,0,12">
-      <TextBlock Text="VRR CREATOR" FontSize="24" FontWeight="Bold" Foreground="#FF35D0E8"/>
+      <TextBlock Text="VRR UPDATER" FontSize="24" FontWeight="Bold" Foreground="#FF35D0E8"/>
       <TextBlock Text="VR Realms Creator Kit manager" FontSize="12" Foreground="#FF8A96A6"/>
     </StackPanel>
 
@@ -133,7 +167,7 @@ $script:Releases = @()
 function Refresh-Releases {
     $local = Get-LocalVersion
     if (-not $local) {
-        $TxtInstalled.Text = "Kit not found — keep VRR Creator in the folder that contains 'VRRealms'."
+        $TxtInstalled.Text = "Kit not found — keep VRR Updater in the folder that contains 'VRRealms'."
         $TxtPath.Text = $UPluginPath
         Set-Status "Cannot continue until the kit is found." '#FFE8615F'
         return
@@ -206,7 +240,7 @@ function Install-Release($entry) {
     }
 
     $local  = Get-LocalVersion
-    $tmpDir = Join-Path $env:TEMP ("VRRCreator_" + [guid]::NewGuid().ToString('N'))
+    $tmpDir = Join-Path $env:TEMP ("VRRUpdater_" + [guid]::NewGuid().ToString('N'))
     New-Item -ItemType Directory -Path $tmpDir -Force | Out-Null
     $zipPath = Join-Path $tmpDir $entry.Asset.name
 
@@ -224,14 +258,14 @@ function Install-Release($entry) {
         try {
             foreach ($e in $archive.Entries) {
                 $name = $e.FullName -replace '\\', '/'
-                if ($name -notlike "$SafePrefix*") {
+                if (-not (Test-AllowedEntry $name)) {
                     Set-Status "REFUSED: package tries to write outside the kit plugin folder ($name). Nothing changed." '#FFE8615F'
                     return
                 }
             }
         } finally { $archive.Dispose() }
 
-        $backupDir = Join-Path $KitRoot ("_VRRCreatorBackup_" + $local)
+        $backupDir = Join-Path $KitRoot ("_VRRUpdaterBackup_" + $local)
         if (Test-Path $backupDir) { Remove-Item $backupDir -Recurse -Force }
         Copy-Item $PluginDir $backupDir -Recurse -Force
 
@@ -239,7 +273,7 @@ function Install-Release($entry) {
         Expand-Archive -Path $zipPath -DestinationPath $KitRoot -Force
 
         $now = Get-LocalVersion
-        Set-Status "Installed $now. Your previous tools are in _VRRCreatorBackup_$local. Reopen your project to use them." '#FF6FD07A'
+        Set-Status "Installed $now. Your previous tools are in _VRRUpdaterBackup_$local. Reopen your project to use them." '#FF6FD07A'
         Refresh-Releases
     }
     catch {

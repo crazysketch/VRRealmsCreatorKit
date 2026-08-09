@@ -4,7 +4,17 @@ Build maps and avatars for **VR Realms** and publish them to the Steam Workshop.
 You do **not** need Visual Studio, C++, or the VR Realms source — just Unreal
 Engine 5.8 and a Steam account that has VR Realms in its library.
 
-**New in v0.4.6 — scoring zones now actually see the ball.** The first real
+**New in v0.4.6 — you no longer re-download the kit to get new tools.** Double-click
+**`VRRUpdater.cmd`** with Unreal closed and a window lists every release, marks the one
+you have, and installs the one you pick — about **450 KB** instead of the full 1.2 GB.
+Drop it anywhere inside your kit; it finds the kit on its own.
+
+It only ever writes to the kit's plugin folder and to itself. Your maps and avatars are
+never touched, every download is checked before anything is unpacked, and your current
+tools are backed up first. No login, no password — the repository is public and it reads
+it anonymously.
+
+**Also new in v0.4.6 — scoring zones now actually see the ball.** The first real
 playtest of the game devices turned up three things, and none of them was
 anything you did wrong.
 
