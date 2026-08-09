@@ -1,8 +1,23 @@
-# VR Realms Creator Kit — v0.4.6 (Alpha, UE 5.8)
+# VR Realms Creator Kit — v0.4.6.1 (Alpha, UE 5.8)
 
 Build maps and avatars for **VR Realms** and publish them to the Steam Workshop.
 You do **not** need Visual Studio, C++, or the VR Realms source — just Unreal
 Engine 5.8 and a Steam account that has VR Realms in its library.
+
+**New in v0.4.6.1 — two settings for ball games, both from a real match.**
+
+**Zone → "Only reacts to".** Type a tag and nothing without it can set the zone off.
+"Triggered by" answers *is it a person?*, which turns out not to be the same question as
+*is it the ball?* — in testing somebody threw a rifle out of the court and it reset the
+volleyball, because a rifle is an object too. For a ball game type **`VRHit`**; that tag is
+already on your ball because it is what makes it hittable. Leave it empty for the old
+behaviour.
+
+**Ball home → "Serves for".** Place two home markers, one on each side, and set this to Red
+on one and Blue on the other. The ball then returns to whichever team just won the point,
+the way volleyball actually works. Leave it on *Always* if you only have one marker.
+Worth doing: with a single home marker on one half, that side won 10 points to 2 in
+testing purely because the ball kept reappearing on their side of the net.
 
 **New in v0.4.6 — you no longer re-download the kit to get new tools.** Double-click
 **`VRRUpdater.cmd`** with Unreal closed and a window lists every release, marks the one
