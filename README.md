@@ -1,4 +1,19 @@
-# VR Realms Creator Kit — v0.4.7.3 (Alpha, UE 5.8)
+# VR Realms Creator Kit — v0.4.7.4 (Alpha, UE 5.8)
+
+**New in v0.4.7.4 — your upload reaches review straight away.**
+
+Until now the review queue found new items by watching Steam's search index. That turns out
+not to list everything: two perfectly good public items — right app, correct tags, reachable
+by direct link — never appeared in it at all, and the only thing setting them apart was that
+they came from a newer Steam account with very few uploads. Steam seems to hold such accounts
+back from search. Nothing was broken, and no amount of waiting would have fixed it.
+
+So the kit now tells vr-realms.com about your item the moment the upload succeeds. Your work
+reaches the review queue immediately, whatever Steam's search index thinks.
+
+It is fire-and-forget and cannot hurt an upload: by the time it runs your item is already
+published. If the site is unreachable you get a note in the log saying so, and the item is
+found the old way instead.
 
 Build maps and avatars for **VR Realms** and publish them to the Steam Workshop.
 You do **not** need Visual Studio, C++, or the VR Realms source — just Unreal
