@@ -168,6 +168,54 @@ $Headers        = @{ 'User-Agent' = 'VRRUpdater' }
 
     <ListView Grid.Row="2" x:Name="LstReleases" Background="#FF1E232B" Foreground="#FFE6EAF0"
               BorderBrush="#FF2C333D" FontSize="13">
+      <!-- The selected row used to be unreadable: a PALE highlight under this list's light text.
+           The fix is a dark highlight, NOT dark text - the row is only pale while it is selected,
+           so darkening the text would break every OTHER row.
+           ⚠ DO NOT "simplify" this back to overriding SystemColors.HighlightBrushKey. That is the
+           advice you will find everywhere and it does NOTHING here: the Aero2 theme (Win8+) that
+           WPF actually uses hard-codes the selection colours inside the ListBoxItem template
+           (#3D26A0DA focused / #3DDADADA unfocused) instead of looking up those resource keys.
+           Verified by rendering the control offscreen - the override changed nothing. Restyling
+           the container is the only thing that reliably wins. -->
+      <ListView.ItemContainerStyle>
+        <Style TargetType="ListViewItem">
+          <Setter Property="Foreground" Value="#FFE6EAF0"/>
+          <Setter Property="Padding" Value="2,3"/>
+          <Setter Property="Template">
+            <Setter.Value>
+              <ControlTemplate TargetType="ListViewItem">
+                <Border x:Name="Bd" Background="{TemplateBinding Background}"
+                        Padding="{TemplateBinding Padding}" SnapsToDevicePixels="True">
+                  <GridViewRowPresenter Content="{TemplateBinding Content}"
+                                        Columns="{TemplateBinding GridView.ColumnCollection}"/>
+                </Border>
+                <ControlTemplate.Triggers>
+                  <Trigger Property="IsMouseOver" Value="True">
+                    <Setter TargetName="Bd" Property="Background" Value="#FF262E38"/>
+                  </Trigger>
+                  <!-- Selected wins over hover, so it is declared last. -->
+                  <Trigger Property="IsSelected" Value="True">
+                    <Setter TargetName="Bd" Property="Background" Value="#FF17505C"/>
+                    <Setter Property="Foreground" Value="#FFFFFFFF"/>
+                  </Trigger>
+                </ControlTemplate.Triggers>
+              </ControlTemplate>
+            </Setter.Value>
+          </Setter>
+        </Style>
+      </ListView.ItemContainerStyle>
+      <!-- The stock header is a light Windows-grey bar, so this list's light text was washed out
+           there too. Make it part of the dark theme instead. -->
+      <ListView.Resources>
+        <Style TargetType="GridViewColumnHeader">
+          <Setter Property="Background" Value="#FF262E38"/>
+          <Setter Property="Foreground" Value="#FFB6C0CC"/>
+          <Setter Property="BorderBrush" Value="#FF2C333D"/>
+          <Setter Property="BorderThickness" Value="0,0,1,1"/>
+          <Setter Property="Padding" Value="8,5"/>
+          <Setter Property="HorizontalContentAlignment" Value="Left"/>
+        </Style>
+      </ListView.Resources>
       <ListView.View>
         <GridView>
           <GridViewColumn Header="Version"   Width="110" DisplayMemberBinding="{Binding Version}"/>

@@ -1,8 +1,38 @@
-# VR Realms Creator Kit — v0.4.6.1 (Alpha, UE 5.8)
+# VR Realms Creator Kit — v0.4.7.1 (Alpha, UE 5.8)
 
 Build maps and avatars for **VR Realms** and publish them to the Steam Workshop.
 You do **not** need Visual Studio, C++, or the VR Realms source — just Unreal
 Engine 5.8 and a Steam account that has VR Realms in its library.
+
+**New in v0.4.7.1 — the kit can fetch SteamCMD for you.**
+
+Uploading needs SteamCMD, and until now the kit assumed you already had it: the Settings
+panel offered a path box and a Browse button, which is only useful once the thing exists.
+Finding it, downloading it and unzipping it yourself was the first wall a new creator hit,
+before they had published anything at all.
+
+There is now a **Download SteamCMD** button next to Steam Login. It downloads SteamCMD from
+Valve, unzips it into `C:\steamcmd`, and fills in the path for you — one click, then straight
+on to Steam Login. If you already have it there it just adopts it instead of downloading
+again, and if the download fails it tells you where to get it manually.
+
+The button sits *before* Steam Login on purpose: without SteamCMD, Login can only fail.
+
+**New in v0.4.7 — the Workshop tag check-boxes are gone, and that is the fix.**
+
+They never worked. Steam's uploader has no way to set Workshop tags at all, so every tag you
+ticked was collected, packed, sent, and silently dropped on arrival. The panel was telling you
+your map was tagged when it was not, which is worse than not offering the boxes at all.
+
+Set tags on the item's own Steam page instead. The upload log now ends by printing the link
+and the two steps, because that click is what actually makes your map findable — an untagged
+item shows up neither in the in-game Filters nor in Workshop browsing. Nothing else about
+filtering changed: the in-game Filters read the tags straight back off Steam, so whatever you
+tick there is exactly what players filter by.
+
+**Also in v0.4.7 — you can read the row you just clicked in VRR Updater.** Selecting a version
+highlighted it in pale blue underneath pale text, so the one row you cared about was the one
+row you could not read.
 
 **New in v0.4.6.1 — two settings for ball games, both from a real match.**
 
