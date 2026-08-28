@@ -1,8 +1,35 @@
-# VR Realms Creator Kit — v0.4.7.1 (Alpha, UE 5.8)
+# VR Realms Creator Kit — v0.4.7.2 (Alpha, UE 5.8)
 
 Build maps and avatars for **VR Realms** and publish them to the Steam Workshop.
 You do **not** need Visual Studio, C++, or the VR Realms source — just Unreal
 Engine 5.8 and a Steam account that has VR Realms in its library.
+
+**New in v0.4.7.2 — the tag check-boxes are back, and this time they work.**
+
+They were removed in 0.4.7 for lying to you: they collected tags and handed them to
+SteamCMD, which has no way to set tags and silently threw them away. The tags never
+reached Steam, but the panel acted like they had.
+
+They now go through Steam's own API instead, which is the thing that actually sets tags.
+Tick what you want, press **Set Tags on Steam**, and the item is tagged — no visiting the
+Workshop page, no asking anyone to do it for you. This was tested against a real item on a
+plain creator account before being built, so it is not a second guess at the same problem.
+
+Three things worth knowing:
+
+- **Upload first.** Tags apply to an item that already exists, so the button needs a
+  Workshop ID. Build, upload, then tag.
+- **Steam must be signed in as the account that owns the item.** That is your Steam
+  *client*, which is not necessarily the account you typed into Steam Login in the kit.
+  If they differ you get a clear "this Steam account does not own the item" instead of a
+  silent failure.
+- **Ticked is the whole list.** Setting tags replaces them, so anything you untick is
+  removed from the item. The boxes are restored from your saved item details when you
+  re-open the kit, so they show what the item is already tagged.
+
+**Personal** has its own **Access** group now, instead of being buried in Avatar Style and
+Map Type. An avatar or map tagged Personal can only be worn or hosted by its owner — other
+players still see you wearing it, they just cannot use it themselves.
 
 **New in v0.4.7.1 — the kit can fetch SteamCMD for you.**
 
@@ -24,11 +51,11 @@ They never worked. Steam's uploader has no way to set Workshop tags at all, so e
 ticked was collected, packed, sent, and silently dropped on arrival. The panel was telling you
 your map was tagged when it was not, which is worse than not offering the boxes at all.
 
-Set tags on the item's own Steam page instead. The upload log now ends by printing the link
-and the two steps, because that click is what actually makes your map findable — an untagged
-item shows up neither in the in-game Filters nor in Workshop browsing. Nothing else about
-filtering changed: the in-game Filters read the tags straight back off Steam, so whatever you
-tick there is exactly what players filter by.
+~~Set tags on the item's own Steam page instead.~~ **That advice was wrong and 0.4.7.2 replaces
+it — see above.** There is no tag editor on a Workshop item's page for its owner; only the app's
+admins get one. So between 0.4.7 and 0.4.7.2 the only way to get an item tagged was to ask. Sorry.
+Nothing else about filtering changed: the in-game Filters read the tags straight back off Steam,
+so whatever you tick is exactly what players filter by.
 
 **Also in v0.4.7 — you can read the row you just clicked in VRR Updater.** Selecting a version
 highlighted it in pale blue underneath pale text, so the one row you cared about was the one
