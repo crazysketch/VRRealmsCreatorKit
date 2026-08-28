@@ -1,8 +1,30 @@
-# VR Realms Creator Kit — v0.4.7.2 (Alpha, UE 5.8)
+# VR Realms Creator Kit — v0.4.7.3 (Alpha, UE 5.8)
 
 Build maps and avatars for **VR Realms** and publish them to the Steam Workshop.
 You do **not** need Visual Studio, C++, or the VR Realms source — just Unreal
 Engine 5.8 and a Steam account that has VR Realms in its library.
+
+**New in v0.4.7.3 — your tags are applied when you upload, and the editor no longer
+pretends to be the game.**
+
+Two things went wrong within an hour of 0.4.7.2 shipping, and both are fixed.
+
+**Tags now apply automatically.** Tick your tags *before* uploading and the upload finishes
+the job — no separate button press to discover. In 0.4.7.2 the "Set Tags on Steam" button
+was easy to miss entirely, and missing it left an item with no tags at all, which is exactly
+what the feature exists to prevent. The button is still there for retagging later without
+re-uploading, and if you upload with nothing ticked the log now says so loudly.
+
+**Steam no longer thinks you are playing VR Realms while the kit is open.** Setting tags
+needs Steam, and asking for it from inside Unreal registered the *editor* as running the
+game. That meant Steam showed you as in-game, playtime piled up against the editor, Steam
+could refuse to launch the real game believing it was already running — and pressing Stop
+in Steam **closed the editor**, taking unsaved work with it. Tagging now happens in a tiny
+helper that exists for about two seconds, so Stop can only ever close that.
+
+Errors got a lot more useful too. `EResult 3` now reads "Steam could not reach its servers —
+check Steam is online", and that particular failure is retried once automatically before you
+are told about it.
 
 **New in v0.4.7.2 — the tag check-boxes are back, and this time they work.**
 
