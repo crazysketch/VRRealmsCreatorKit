@@ -53,7 +53,11 @@ if (-not $EngineDir) { $EngineDir = "C:\Program Files\Epic Games\UE_5.8\Engine" 
 $dll = $null
 foreach ($v in @('Steamv164','Steamv162','Steamv157','Steamv153')) {
     $c = Join-Path $EngineDir "Binaries\ThirdParty\Steamworks\$v\Win64\steam_api64.dll"
-    if (Test-Path $c) { $dll = $c; break }
+    # -LiteralPath, ALWAYS. PowerShell treats [ and ] as wildcard character classes, so a creator
+    # whose engine sits in a folder like "D:\[VRRealms Projects]\UE_5.8" gets Test-Path = $false for
+    # a file that is definitely there, and the only symptom is "steam_api64.dll not found under
+    # <the exact path it is sitting in>". Reported by a creator 2026-08-28.
+    if (Test-Path -LiteralPath $c) { $dll = $c; break }
 }
 if (-not $dll) { Fail "steam_api64.dll not found under $EngineDir" }
 
@@ -62,7 +66,8 @@ if (-not $dll) { Fail "steam_api64.dll not found under $EngineDir" }
 $work = Join-Path $env:TEMP ("vrrtag-" + [guid]::NewGuid().ToString('N').Substring(0,8))
 New-Item -ItemType Directory -Path $work -Force | Out-Null
 try {
-    Copy-Item $dll (Join-Path $work 'steam_api64.dll') -Force
+    # Same reason as above: $dll carries the engine path, brackets and all.
+    Copy-Item -LiteralPath $dll -Destination (Join-Path $work 'steam_api64.dll') -Force
     Set-Content -Path (Join-Path $work 'steam_appid.txt') -Value "$AppId" -Encoding ascii -NoNewline
     $env:SteamAppId  = "$AppId"
     $env:SteamGameId = "$AppId"
