@@ -1,4 +1,29 @@
-# VR Realms Creator Kit — v0.4.7.4 (Alpha, UE 5.8)
+# VR Realms Creator Kit — v0.4.8.0 (Alpha, UE 5.8)
+
+**New in v0.4.8.0 — avatars from other platforms, and physics for tails, ears and hair.**
+
+Two new buttons in the Workshop panel, both aimed at rigs that were never built for VR Realms.
+
+**Map Community Rig** takes an avatar whose bones are named nothing like ours — a VRChat
+export, a Blender rig, anything — and works out where its spine, arms, legs and fingers are by
+looking at the *shape* of the skeleton rather than the names. Bone naming is the thing that has
+always blocked these avatars, and it turns out not to matter: hierarchy is enough. It writes an
+IK Rig you can retarget from, and tells you in plain terms what it found.
+
+**Generate Avatar Physics** takes everything the mapper identified as *not* part of the
+skeleton — tails, ears, hair, whiskers, cloth, and so on — and builds an Animation Blueprint
+that makes them move, then attaches it to your mesh. It picks different settings for different
+things: a tail should swing freely, a chest bone should barely move, and shipping the same
+numbers for both looks wrong in one direction or the other.
+
+It prints every chain it found with a verdict and a reason, including the ones it skipped, so
+if something of yours does not move you can see why rather than guess. The result is an
+ordinary Animation Blueprint — open it and change anything you like, add a chain it did not
+recognise, or throw it away and build your own.
+
+⚠ **This release needs the full kit download, not the updater patch.** The physics feature uses
+a plugin (Kawaii Physics, free and open source) that the patch cannot deliver. Everything else
+works without it, and the physics button will tell you if it is missing.
 
 **New in v0.4.7.4 — your upload reaches review straight away.**
 

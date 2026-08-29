@@ -1,0 +1,8 @@
+{
+	"BuildId": "55116800",
+	"Modules": 
+	{
+		"KawaiiPhysics": "UnrealEditor-KawaiiPhysics.dll",
+		"KawaiiPhysicsEd": "UnrealEditor-KawaiiPhysicsEd.dll"
+	}
+}
