@@ -1,4 +1,8 @@
-# VR Realms Creator Kit — v0.4.8.0 (Alpha, UE 5.8)
+# VR Realms Creator Kit — v0.4.8.1 (Alpha, UE 5.8)
+
+**New in v0.4.8.1 — fixes for avatars already saved in Community/Avatars, and a much better
+retarget pose.** If you are on 0.4.8.0, VRR Updater will bring you up to date; the sample content
+has not changed, so there is no need to re-download the whole kit.
 
 **New in v0.4.8.0 — humanoid avatars rigged anywhere, and physics for tails, ears and hair.**
 
