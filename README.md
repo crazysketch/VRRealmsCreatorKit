@@ -1,25 +1,30 @@
 # VR Realms Creator Kit — v0.4.8.0 (Alpha, UE 5.8)
 
-**New in v0.4.8.0 — avatars from other platforms, and physics for tails, ears and hair.**
+**New in v0.4.8.0 — humanoid avatars rigged anywhere, and physics for tails, ears and hair.**
 
-Two new buttons in the Workshop panel, both aimed at rigs that were never built for VR Realms.
+One new button: **Prepare Avatar**. Pick your skeletal mesh, press it, and it does whatever that
+particular avatar needs.
 
-**Map Community Rig** takes an avatar whose bones are named nothing like ours — a VRChat
-export, a Blender rig, anything — and works out where its spine, arms, legs and fingers are by
-looking at the *shape* of the skeleton rather than the names. Bone naming is the thing that has
-always blocked these avatars, and it turns out not to matter: hierarchy is enough. It writes an
-IK Rig you can retarget from, and tells you in plain terms what it found.
+If your avatar is already rigged on an Unreal mannequin, it says so and leaves it alone — that
+one is driven directly, and always has been. If it is rigged some other way, it works out where
+the spine, arms, legs and fingers are by looking at the **shape** of the skeleton rather than at
+bone names. Naming is the thing that has always blocked these avatars, and it turns out not to
+matter: hierarchy is enough. It does not care whether your hips are called `Hips`, `pelvis` or
+something in a language we have never seen.
 
-**Generate Avatar Physics** takes everything the mapper identified as *not* part of the
-skeleton — tails, ears, hair, whiskers, cloth, and so on — and builds an Animation Blueprint
-that makes them move, then attaches it to your mesh. It picks different settings for different
-things: a tail should swing freely, a chest bone should barely move, and shipping the same
-numbers for both looks wrong in one direction or the other.
+Then it adds physics — tails, ears, hair, whiskers, cloth, anything loose — as an Animation
+Blueprint attached to your mesh. It picks different settings for different things: a tail should
+swing freely, a chest bone should barely move, and using the same numbers for both looks wrong in
+one direction or the other.
 
-It prints every chain it found with a verdict and a reason, including the ones it skipped, so
-if something of yours does not move you can see why rather than guess. The result is an
-ordinary Animation Blueprint — open it and change anything you like, add a chain it did not
-recognise, or throw it away and build your own.
+It prints every chain it found with a verdict and a reason, including the ones it skipped, so if
+something of yours does not move you can see why rather than guess. The result is an ordinary
+Animation Blueprint — open it and change anything you like, add a chain it did not recognise, or
+throw it away and build your own.
+
+**Pressing Prepare Avatar twice is safe.** If physics already exists it is left exactly as it is,
+so it can never undo your own tuning. There are separate buttons for running a single step, or for
+deliberately rebuilding the physics, if you ever want them.
 
 ⚠ **This release needs the full kit download, not the updater patch.** The physics feature uses
 a plugin (Kawaii Physics, free and open source) that the patch cannot deliver. Everything else

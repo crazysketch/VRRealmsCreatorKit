@@ -2,7 +2,7 @@
     VRR UPDATER — Creator Kit manager (window)
     ---------------------------------------------------------------------------
     Lists every published kit release, shows which one you have, and installs
-    the one you pick. Same job as VRChat's Creator Companion, scoped to the
+    the one you pick — the usual "creator companion" job, scoped to the
     VR Realms kit.
 
     WHY WPF-FROM-POWERSHELL AND NOT A C# .EXE
