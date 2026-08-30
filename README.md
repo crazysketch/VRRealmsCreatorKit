@@ -1,8 +1,20 @@
-# VR Realms Creator Kit — v0.4.8.1 (Alpha, UE 5.8)
+# VR Realms Creator Kit — v0.4.8.2 (Alpha, UE 5.8)
+
+**New in v0.4.8.2 — avatars no longer turn up grey in-game.** When you import an FBX, Unreal
+creates *material instances* rather than materials, and it parents them to a material that lives
+inside the editor, not inside VR Realms. Your textures packed fine, but nothing in the game could
+read them, so the avatar wore plain grey and nothing anywhere reported a problem.
+
+Build now copies any material your avatar needs that the game does not have into the avatar's own
+folder, so it ships inside your pak. You do not have to do anything — import your FBX the way you
+always have. The validation panel also lists these assets by name before you build, instead of
+staying silent about them.
+
+If you are on 0.4.8.0 or 0.4.8.1, VRR Updater will bring you up to date; the sample content has
+not changed, so there is no need to re-download the whole kit.
 
 **New in v0.4.8.1 — fixes for avatars already saved in Community/Avatars, and a much better
-retarget pose.** If you are on 0.4.8.0, VRR Updater will bring you up to date; the sample content
-has not changed, so there is no need to re-download the whole kit.
+retarget pose.**
 
 **New in v0.4.8.0 — humanoid avatars rigged anywhere, and physics for tails, ears and hair.**
 
