@@ -1,4 +1,13 @@
-# VR Realms Creator Kit — v0.4.8.2 (Alpha, UE 5.8)
+# VR Realms Creator Kit — v0.4.8.3 (Alpha, UE 5.8)
+
+**New in v0.4.8.3 — the last missing textures.** 0.4.8.2 fixed materials arriving without their
+parent; this fixes the textures those materials wanted. Build's dependency scan used to stop the
+moment it hit something it could not relocate, so a texture sitting one level below an FBX-imported
+material was never found and never packed. The usual symptom was every texture correct except one —
+often the face. It now keeps looking past assets it cannot move.
+
+If you shipped an avatar with one stubbornly missing texture, update and press Build again. Nothing
+in your project needs changing.
 
 **New in v0.4.8.2 — avatars no longer turn up grey in-game.** When you import an FBX, Unreal
 creates *material instances* rather than materials, and it parents them to a material that lives
