@@ -1,4 +1,18 @@
-# VR Realms Creator Kit — v0.4.8.3 (Alpha, UE 5.8)
+# VR Realms Creator Kit — v0.4.9 (Alpha, UE 5.8)
+
+**New in v0.4.9 — grey faces, actually fixed.** It was never a missing texture. Unreal materials
+carry switches saying what kinds of mesh they may be drawn on, and *Used with Morph Targets* is the
+one a face needs. The editor ticks it invisibly while you work but never saves it, and nothing ticks
+it when your avatar is cooked — so the cook built no face version of the material and fell back to
+default grey. Your head is normally the only part with morph targets, which is why the symptom was
+face-and-eyebrows only and read like a packing failure. The kit's three avatar materials now save
+those switches, and the validator warns you before upload if any material is missing one.
+
+⚠ **This release changes the sample content, so it is a full kit download, not a patch.** The fix
+lives in the avatar materials and the patch channel can only carry the kit's tools.
+
+If you already shipped a grey-faced avatar, get the full kit, press Build and re-upload. Nothing in
+your own project needs changing.
 
 **New in v0.4.8.3 — the last missing textures.** 0.4.8.2 fixed materials arriving without their
 parent; this fixes the textures those materials wanted. Build's dependency scan used to stop the
