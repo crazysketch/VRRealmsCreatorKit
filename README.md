@@ -1,4 +1,22 @@
-# VR Realms Creator Kit — v0.4.9 (Alpha, UE 5.8)
+# VR Realms Creator Kit — v0.4.10 (Alpha, UE 5.8)
+
+**New in v0.4.10 — Build now checks your project's renderer settings before it cooks.** A few
+lines in `Config/DefaultEngine.ini` decide what your cooked shaders contain, and the game uses
+them without checking. If your project was made fresh rather than from the kit, or you changed
+those settings for a bake, your content can look perfect on a flat screen and still be wrong in
+VR: with instanced stereo off it renders normally in the left eye and **black in the right eye**;
+without the SM5 shader format every material is the grey checkerboard. Nothing warned you at any
+step. Now Build compares the settings the cook is about to use against the game's and refuses to
+cook if they drifted, listing each line, the value it found, and what players would have seen.
+
+Using GPU Lightmass? It needs SM6 and ray tracing in the editor, which is exactly the switch that
+drifts these settings. Bake with them on, then put the kit's `DefaultEngine.ini` back before you
+Build — your baked lighting stays with the map. The comments in that file spell it out.
+
+Also in this release: VRR Updater has been restyled to match vr-realms.com, its release notes no
+longer show raw Markdown marks, and the kit-not-found screen shows full folder paths.
+
+The sample content has not changed, so VRR Updater brings you up to date with the small patch.
 
 **New in v0.4.9 — grey faces, actually fixed.** It was never a missing texture. Unreal materials
 carry switches saying what kinds of mesh they may be drawn on, and *Used with Morph Targets* is the
