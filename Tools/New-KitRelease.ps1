@@ -72,7 +72,7 @@ try {
         }
     }
     foreach ($ps in (Get-ChildItem (Join-Path $KitRoot 'Tools') -Filter *.ps1 -File)) {
-        if ($ps.Name -eq 'New-KitRelease.ps1') { continue }   # maintainer-only, creators do not need it
+        if ($ps.Name -like 'New-*.ps1') { continue }   # maintainer-only (New-KitRelease, New-FullKitZip), creators do not need them
         $entry = "Tools/$($ps.Name)"
         [void][IO.Compression.ZipFileExtensions]::CreateEntryFromFile($zip, $ps.FullName, $entry)
         Write-Host "  + $entry"
@@ -99,7 +99,7 @@ Write-Host ""
 Write-Host "  Built $([math]::Round($size/1KB,1)) KB  ->  $zipPath"
 Write-Host "  sha256 $sha"
 Write-Host ""
-Write-Host "  Publish it:" -ForegroundColor Cyan
-Write-Host "    gh release create v$version ""$zipPath"" ""$outDir\manifest.json"" --title ""Creator Kit $version"" --notes-file <notes.md>"
+Write-Host "  Next: Tools\New-FullKitZip.ps1 (adds the full-kit zip + the file table Verify uses to this manifest), then:" -ForegroundColor Cyan
+Write-Host "    gh release create v$version ""$outDir\VRRealmsCreatorKit-v$version.zip"" ""$zipPath"" ""$outDir\manifest.json"" --title ""Creator Kit $version"" --notes-file <notes.md>"
 Write-Host ""
 Write-Host "  VRR Updater shows the release notes to creators, so write them for creators." -ForegroundColor DarkGray

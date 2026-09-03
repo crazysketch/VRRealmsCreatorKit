@@ -16,6 +16,10 @@
     THE THREE RULES (identical to VRRUpdater-Console.ps1 — keep them in sync)
       1. Only ever writes inside VRRealms\Plugins\VRRealmsCreatorKit\. Every zip
          entry is checked against that prefix BEFORE extracting anything.
+         (Repair, added 2026-09-02, is the one deliberate exception: it may also
+         restore files the RELEASE'S OWN FILE TABLE lists — Config, sample content,
+         the tools — and nothing else. Never a creator's Community folder. See the
+         Verify + Repair section.)
       2. NO credentials, ever. Public repo, anonymous reads. This ships to
          creators — a token or FTP password here would be handed to everyone.
       3. Refuses to install while Unreal is open (the plugin DLL is locked).
@@ -303,7 +307,7 @@ $Headers        = @{ 'User-Agent' = 'VRRUpdater' }
                oversized CornerRadius and draws a lens shape instead of a pill. -->
           <Border Grid.Column="2" VerticalAlignment="Center" CornerRadius="13" Background="{StaticResource Surface}"
                   BorderBrush="{StaticResource Line}" BorderThickness="1" Padding="11,4">
-            <TextBlock Text="build 2026-09-02.1" FontSize="12" FontWeight="Medium" Foreground="{StaticResource Muted}"/>
+            <TextBlock Text="build 2026-09-02.2" FontSize="12" FontWeight="Medium" Foreground="{StaticResource Muted}"/>
           </Border>
         </Grid>
       </Border>
@@ -319,7 +323,7 @@ $Headers        = @{ 'User-Agent' = 'VRRUpdater' }
         <!-- page title, like the site's page-hero -->
         <StackPanel Grid.Row="0" Margin="0,0,0,16">
           <TextBlock Text="VRR Updater" FontSize="26" FontWeight="SemiBold" Foreground="{StaticResource Text}"/>
-          <TextBlock Text="Pick a release and install it. Only the kit's plugin folder is ever written to." FontSize="13"
+          <TextBlock Text="Install a release, or verify the kit's own files and repair any that changed. Your maps and avatars are never touched." FontSize="13"
                      Foreground="{StaticResource Muted}" Margin="0,2,0,0"/>
         </StackPanel>
 
@@ -446,6 +450,19 @@ $Headers        = @{ 'User-Agent' = 'VRRUpdater' }
                                 <Setter Property="Background" Value="#FF2D2D2D"/>
                                 <Setter Property="BorderBrush" Value="#FF383838"/>
                               </DataTrigger>
+                              <!-- Verify results -->
+                              <DataTrigger Binding="{Binding Status}" Value="OK">
+                                <Setter Property="Background" Value="#2434D399"/>
+                                <Setter Property="BorderBrush" Value="#5934D399"/>
+                              </DataTrigger>
+                              <DataTrigger Binding="{Binding Status}" Value="MODIFIED">
+                                <Setter Property="Background" Value="#24EAB308"/>
+                                <Setter Property="BorderBrush" Value="#59EAB308"/>
+                              </DataTrigger>
+                              <DataTrigger Binding="{Binding Status}" Value="MISSING">
+                                <Setter Property="Background" Value="#24F87171"/>
+                                <Setter Property="BorderBrush" Value="#59F87171"/>
+                              </DataTrigger>
                             </Style.Triggers>
                           </Style>
                         </Border.Style>
@@ -462,6 +479,15 @@ $Headers        = @{ 'User-Agent' = 'VRRUpdater' }
                                 </DataTrigger>
                                 <DataTrigger Binding="{Binding Status}" Value="FULL DOWNLOAD ONLY">
                                   <Setter Property="Foreground" Value="#FFEAB308"/>
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding Status}" Value="OK">
+                                  <Setter Property="Foreground" Value="#FF34D399"/>
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding Status}" Value="MODIFIED">
+                                  <Setter Property="Foreground" Value="#FFEAB308"/>
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding Status}" Value="MISSING">
+                                  <Setter Property="Foreground" Value="#FFF87171"/>
                                 </DataTrigger>
                               </Style.Triggers>
                             </Style>
@@ -497,17 +523,19 @@ $Headers        = @{ 'User-Agent' = 'VRRUpdater' }
           </ListView>
         </Border>
 
-        <!-- footer: status on the left, actions on the right -->
-        <Grid Grid.Row="3" Margin="0,14,0,0">
-          <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="*"/>
-            <ColumnDefinition Width="Auto"/>
-          </Grid.ColumnDefinitions>
-          <TextBlock x:Name="TxtStatus" Grid.Column="0" FontSize="12.5" Foreground="{StaticResource Muted}" TextWrapping="Wrap"
-                     VerticalAlignment="Center" Margin="0,0,16,0"/>
-          <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+        <!-- footer: status line above, actions below (five buttons left no room beside the text) -->
+        <Grid Grid.Row="3" Margin="0,12,0,0">
+          <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+          </Grid.RowDefinitions>
+          <TextBlock x:Name="TxtStatus" Grid.Row="0" FontSize="12.5" Foreground="{StaticResource Muted}" TextWrapping="Wrap"
+                     MinHeight="18" Margin="0,0,0,10"/>
+          <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right">
+            <Button x:Name="BtnVerify"  Content="Verify files" Style="{StaticResource BtnLine}" Margin="0,0,8,0"/>
             <Button x:Name="BtnRefresh" Content="Refresh" Style="{StaticResource BtnLine}" Margin="0,0,8,0"/>
             <Button x:Name="BtnPage"    Content="Open releases page" Style="{StaticResource BtnLine}" Margin="0,0,8,0"/>
+            <Button x:Name="BtnRepair"  Content="Repair" Style="{StaticResource BtnFill}" MinWidth="110" Margin="0,0,8,0" Visibility="Collapsed"/>
             <Button x:Name="BtnInstall" Content="Install selected" Style="{StaticResource BtnFill}" IsEnabled="False" MinWidth="150"/>
           </StackPanel>
         </Grid>
@@ -532,6 +560,8 @@ $ImgBg             = $win.FindName('ImgBg')
 $BtnRefresh        = $win.FindName('BtnRefresh')
 $BtnPage           = $win.FindName('BtnPage')
 $BtnInstall        = $win.FindName('BtnInstall')
+$BtnVerify         = $win.FindName('BtnVerify')
+$BtnRepair         = $win.FindName('BtnRepair')
 
 function Set-Status($text, $colour = '#FF8A8A8A') {
     $TxtStatus.Text = $text
@@ -576,7 +606,7 @@ function Refresh-Releases {
     if (-not $local) {
         $TxtInstalledLabel.Text = "KIT NOT FOUND"
         $TxtInstalled.FontSize  = 14
-        $TxtInstalled.Text = "Put VRRUpdater.cmd anywhere inside your Creator Kit (build 2026-09-02.1)."
+        $TxtInstalled.Text = "Put VRRUpdater.cmd anywhere inside your Creator Kit (build 2026-09-02.2)."
         $TxtPath.Text = $UPluginPath
         Set-Badge ''
         # Show EVERY folder we looked in. "Not found" alone costs a support round trip;
@@ -636,6 +666,7 @@ function Refresh-Releases {
     }
 
     $LstReleases.ItemsSource = $rows
+    Set-ListMode 'releases'
     if ($rows.Count -eq 0) {
         Set-Status "No releases published yet." '#FFEAB308'
         Set-Badge 'NO RELEASES'
@@ -716,11 +747,186 @@ function Install-Release($entry) {
 }
 
 # ---------------------------------------------------------------------------
+# Verify + Repair (added 2026-09-02, needs a release with a file table: 0.4.11+)
+# ---------------------------------------------------------------------------
+# WHY: a creator can overwrite or delete any shipped kit file and nothing tells them. The case that
+# actually happened: a project whose Config/DefaultEngine.ini was not the kit's cooked without
+# instanced stereo, and every VR player saw that content black in the right eye. Steam has "verify
+# integrity of game files"; this is the same idea for the kit.
+#
+# The source of truth is the FILE TABLE in the release's manifest.json — `files`: path -> sha256 +
+# size for every file in the full kit zip, written by Tools\New-FullKitZip.ps1. Verify hashes the
+# local copies against it and lists OK / MODIFIED / MISSING. Repair downloads the full kit zip named
+# in that same manifest, checks the zip's own sha256, and re-extracts ONLY the differing entries:
+#   - nothing that is not in the table is ever written (a creator's own content is never touched),
+#   - nothing is ever deleted (extra files are theirs),
+#   - every replaced file is backed up first, same folder pattern as Install.
+# Verify is pinned to the manifest of the release you have INSTALLED, so it compares against what
+# this kit shipped as, not against whatever is newest.
+$script:ListMode       = 'releases'   # 'releases' | 'verify' — what the list is showing
+$script:VerifyBad      = @()          # rel paths needing repair, from the last Verify
+$script:VerifyManifest = $null
+
+function Set-ListMode($mode) {
+    $script:ListMode = $mode
+    $cols = $LstReleases.View.Columns
+    if ($cols.Count -ge 4) { $cols[3].Header = $(if ($mode -eq 'verify') { 'FILE' } else { 'WHAT CHANGED' }) }
+    $BtnRepair.Visibility = $(if ($mode -eq 'verify' -and $script:VerifyBad.Count -gt 0) { 'Visible' } else { 'Collapsed' })
+    $BtnInstall.IsEnabled = ($mode -eq 'releases' -and $LstReleases.SelectedIndex -ge 0)
+}
+
+function Get-InstalledManifest {
+    $local = Get-LocalVersion
+    if (-not $local) { return $null }
+    $entry = $script:Releases | Where-Object { $_.Version -eq $local } | Select-Object -First 1
+    if (-not $entry) {
+        Set-Status "Verify compares against the release you have installed ($local), and that release is no longer on GitHub. Install the latest first, then Verify." '#FFEAB308'
+        return $null
+    }
+    $asset = $entry.Release.assets | Where-Object { $_.name -eq 'manifest.json' } | Select-Object -First 1
+    if (-not $asset) {
+        Set-Status "Release $local has no manifest.json - nothing to verify against." '#FFEAB308'
+        return $null
+    }
+    $tmp = Join-Path $env:TEMP ("VRRUpdater_manifest_" + [guid]::NewGuid().ToString('N') + ".json")
+    try {
+        Invoke-WebRequest -Uri $asset.browser_download_url -OutFile $tmp -UseBasicParsing -Headers $Headers -TimeoutSec 30
+        $m = Get-Content -LiteralPath $tmp -Raw | ConvertFrom-Json
+    } finally { Remove-Item -LiteralPath $tmp -Force -ErrorAction SilentlyContinue }
+    if (-not $m.files) {
+        Set-Status "Release $local was published before the kit carried a file table. Install the latest, then Verify." '#FFEAB308'
+        return $null
+    }
+    return $m
+}
+
+# Pure: file table + kit root -> one row per shipped file. No UI in here so it can be tested alone.
+function Compare-KitFiles($manifest, $root) {
+    $rows = New-Object System.Collections.ArrayList
+    foreach ($p in $manifest.files.PSObject.Properties) {
+        $rel  = [string]$p.Name
+        $path = Join-Path $root ($rel -replace '/', '\')
+        $status = 'OK'
+        if (-not (Test-Path -LiteralPath $path)) {
+            $status = 'MISSING'
+        } elseif ((Get-FileHash -LiteralPath $path -Algorithm SHA256).Hash -ne $p.Value.sha256) {
+            $status = 'MODIFIED'
+        }
+        [void]$rows.Add([pscustomobject]@{ Rel = $rel; Status = $status })
+    }
+    return ,$rows
+}
+
+function Invoke-Verify {
+    if (-not $script:Releases -or $script:Releases.Count -eq 0) { Refresh-Releases }
+    $local = Get-LocalVersion
+    if (-not $local) { return }
+    Set-Status "Checking the installed files against release $local..."
+    $m = Get-InstalledManifest
+    if (-not $m) { return }
+
+    $result = Compare-KitFiles $m $KitRoot
+    $bad    = @($result | Where-Object { $_.Status -ne 'OK' })
+    $script:VerifyBad      = @($bad | ForEach-Object { $_.Rel })
+    $script:VerifyManifest = $m
+
+    # Problems first, then the OK rows, so nothing needs scrolling to be seen.
+    $rows = New-Object System.Collections.ArrayList
+    foreach ($r in ($bad + @($result | Where-Object { $_.Status -eq 'OK' }))) {
+        [void]$rows.Add([pscustomobject]@{ Version=''; Published=''; Status=$r.Status; Summary=$r.Rel })
+    }
+    $LstReleases.ItemsSource = $rows
+    Set-ListMode 'verify'
+
+    if ($bad.Count -eq 0) {
+        Set-Status "All $($result.Count) shipped files match release $local." '#FF34D399'
+    } else {
+        $mod = @($bad | Where-Object { $_.Status -eq 'MODIFIED' }).Count
+        $mis = @($bad | Where-Object { $_.Status -eq 'MISSING' }).Count
+        Set-Status "$($bad.Count) of $($result.Count) shipped files differ ($mod modified, $mis missing). Press Repair to restore them from release $local - your copies are backed up first." '#FFEAB308'
+    }
+}
+
+function Invoke-Repair {
+    $m = $script:VerifyManifest
+    if (-not $m -or $script:VerifyBad.Count -eq 0) { return }
+
+    if (Get-Process -Name 'UnrealEditor' -ErrorAction SilentlyContinue) {
+        Set-Status "Close Unreal Editor first - the kit's files are locked while it is open." '#FFF87171'
+        return
+    }
+    $local = Get-LocalVersion
+    $entry = $script:Releases | Where-Object { $_.Version -eq $local } | Select-Object -First 1
+    $asset = $null
+    if ($entry -and $m.fullKitZip) { $asset = $entry.Release.assets | Where-Object { $_.name -eq $m.fullKitZip } | Select-Object -First 1 }
+    if (-not $asset) {
+        Set-Status "Release $local does not carry '$($m.fullKitZip)' to repair from." '#FFF87171'
+        return
+    }
+
+    $tmpDir  = Join-Path $env:TEMP ("VRRUpdater_" + [guid]::NewGuid().ToString('N'))
+    New-Item -ItemType Directory -Path $tmpDir -Force | Out-Null
+    $zipPath = Join-Path $tmpDir $asset.name
+    try {
+        Set-Status "Downloading $($asset.name) ($([math]::Round($asset.size / 1MB, 2)) MB) to repair $($script:VerifyBad.Count) file(s)..."
+        Invoke-WebRequest -Uri $asset.browser_download_url -OutFile $zipPath -UseBasicParsing -Headers $Headers -TimeoutSec 300
+
+        # The manifest names the zip's own hash. A download that does not match it is not used, full stop.
+        $sha = (Get-FileHash -LiteralPath $zipPath -Algorithm SHA256).Hash
+        if ($sha -ne $m.fullKitSha256) {
+            Set-Status "REFUSED: the downloaded kit does not match the release's checksum. Nothing changed." '#FFF87171'
+            return
+        }
+
+        $backupDir = Join-Path $KitRoot ("_VRRUpdaterBackup_" + $local + "_repair_" + (Get-Date -Format 'MMdd-HHmmss'))
+        $restored  = 0
+        $skipped   = New-Object System.Collections.ArrayList
+        $zip = [IO.Compression.ZipFile]::OpenRead($zipPath)
+        try {
+            foreach ($rel in $script:VerifyBad) {
+                # ⚠ THE GUARDS. Only a path the release's own table lists, and never a creator's
+                # Community folder (the two _PUT_YOUR_ markers are the only shipped files there).
+                if (-not $m.files.PSObject.Properties[$rel]) { [void]$skipped.Add($rel); continue }
+                if ($rel -like 'VRRealms/Content/VRRealms/Community/*' -and $rel -notlike '*/_PUT_YOUR_*') { [void]$skipped.Add($rel); continue }
+                $e = $zip.GetEntry("VRRealmsCreatorKit/$rel")
+                if (-not $e) { [void]$skipped.Add($rel); continue }
+
+                $target = Join-Path $KitRoot ($rel -replace '/', '\')
+                if (Test-Path -LiteralPath $target) {
+                    $bak = Join-Path $backupDir ($rel -replace '/', '\')
+                    [void][IO.Directory]::CreateDirectory((Split-Path $bak -Parent))
+                    [IO.File]::Copy($target, $bak, $true)
+                }
+                [void][IO.Directory]::CreateDirectory((Split-Path $target -Parent))
+                [IO.Compression.ZipFileExtensions]::ExtractToFile($e, $target, $true)
+                $restored++
+            }
+        } finally { $zip.Dispose() }
+
+        $msg = "Restored $restored file(s) from release $local."
+        if (Test-Path -LiteralPath $backupDir) { $msg += " Your previous copies are in $(Split-Path $backupDir -Leaf)." }
+        if ($skipped.Count -gt 0) { $msg += " Skipped $($skipped.Count) not in the release." }
+        $msg += " Reopen your project to use them."
+        Set-Status $msg '#FF34D399'
+        Invoke-Verify
+    }
+    catch {
+        Set-Status "Repair failed: $($_.Exception.Message). Nothing else was changed." '#FFF87171'
+    }
+    finally {
+        if (Test-Path -LiteralPath $tmpDir) { Remove-Item -LiteralPath $tmpDir -Recurse -Force -ErrorAction SilentlyContinue }
+    }
+}
+
+# ---------------------------------------------------------------------------
 # Wiring
 # ---------------------------------------------------------------------------
-$LstReleases.Add_SelectionChanged({ $BtnInstall.IsEnabled = ($LstReleases.SelectedIndex -ge 0) })
+# Install only makes sense while the list shows releases; in verify mode the rows are files.
+$LstReleases.Add_SelectionChanged({ $BtnInstall.IsEnabled = ($script:ListMode -eq 'releases' -and $LstReleases.SelectedIndex -ge 0) })
 $BtnRefresh.Add_Click({ Refresh-Releases })
 $BtnPage.Add_Click({ Start-Process "https://github.com/$Repo/releases" })
+$BtnVerify.Add_Click({ Invoke-Verify })
+$BtnRepair.Add_Click({ Invoke-Repair })
 $BtnInstall.Add_Click({
     $i = $LstReleases.SelectedIndex
     if ($i -ge 0 -and $i -lt $script:Releases.Count) { Install-Release $script:Releases[$i] }

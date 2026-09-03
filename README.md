@@ -1,4 +1,16 @@
-# VR Realms Creator Kit — v0.4.10 (Alpha, UE 5.8)
+# VR Realms Creator Kit — v0.4.11 (Alpha, UE 5.8)
+
+**New in v0.4.11 — Verify files, and Repair.** The kit's own files can get overwritten or deleted
+along the way, most often the renderer settings in `Config/DefaultEngine.ini`, and until now nothing
+would tell you. VRR Updater has a new **Verify files** button: it checks every file the kit shipped
+against the release you have installed and lists what is modified or missing. If anything differs, a
+**Repair** button restores just those files from the release, backing up your copies first. It only
+ever touches files the kit shipped. Your maps and avatars are never read, written or deleted.
+
+Releases before 0.4.11 carry no file table, so if Verify says it has nothing to compare against,
+press Install first and then Verify.
+
+The sample content has not changed, so VRR Updater brings you up to date with the small patch.
 
 **New in v0.4.10 — Build now checks your project's renderer settings before it cooks.** A few
 lines in `Config/DefaultEngine.ini` decide what your cooked shaders contain, and the game uses
