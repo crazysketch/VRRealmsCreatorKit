@@ -1,18 +1,23 @@
-# VR Realms Creator Kit — v0.4.11 (Alpha, UE 5.8)
+# VR Realms Creator Kit — v0.4.12 (Alpha, UE 5.8)
 
 Build maps and avatars for **VR Realms** and publish them to the Steam Workshop.
 You do **not** need Visual Studio, C++, or the VR Realms source — just Unreal
 Engine 5.8 and a Steam account that has VR Realms in its library.
 
-**New in v0.4.11 — Verify files, and Repair.** The kit's own files can get overwritten or deleted
-along the way, most often the renderer settings in `Config/DefaultEngine.ini`, and until now nothing
-would tell you. VRR Updater has a new **Verify files** button: it checks every file the kit shipped
-against the release you have installed and lists what is modified or missing. If anything differs, a
-**Repair** button restores just those files from the release, backing up your copies first. It only
-ever touches files the kit shipped. Your maps and avatars are never read, written or deleted.
+**New in v0.4.12 — Blueprint nodes for building your own games.** The scripting API grows from a
+handful of nodes to about forty-five, all under **VR Realms** in the palette: who is in the realm,
+where each player is, points and labels everyone can read, messages and chat lines, teleport and
+respawn, a way for a button on one machine to reach the host, channels, screens and voice. Add the
+**Realm Events** component to any actor to react to players arriving and leaving, points changing,
+public chat, channels and the built-in game modes. A scoreboard marker in a map with no game mode
+now lists everyone's points. The full tables, including what is replicated, are on the site's
+Scripting API pages.
 
-Releases before 0.4.11 carry no file table, so if Verify says it has nothing to compare against,
-press Install first and then Verify.
+**These nodes need the matching VR Realms update.** They appear in your palette now, and they do
+their work in-game once the game build that ships alongside this kit is live.
+
+Also in this release: Build refuses a map whose Blueprints use Execute Console Command, Open Level,
+Quit Game, Launch URL, Set Game Paused or the session nodes, and names the Blueprint and the node.
 
 The sample content has not changed, so VRR Updater brings you up to date with the small patch.
 
