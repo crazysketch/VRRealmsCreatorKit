@@ -1,10 +1,21 @@
-# VR Realms Creator Kit — v0.4.13 (Alpha, UE 5.8)
+# VR Realms Creator Kit — v0.4.14 (Alpha, UE 5.8)
 
 Build maps and avatars for **VR Realms** and publish them to the Steam Workshop.
 You do **not** need Visual Studio, C++, or the VR Realms source — just Unreal
 Engine 5.8 and a Steam account that has VR Realms in its library.
 
-**New in v0.4.13 — Blueprint nodes for building your own games.** The scripting API grows from a
+**New in v0.4.14 — the cloth check.** Validate now reads every clothing asset on an avatar and tells
+you what its simulation costs: how many particles it simulates, how many solver passes it runs per
+frame, and whether self collision is on. We measured it in a full room: bones, triangles and face
+shapes barely register, but one dress simulated on the full render mesh with five subdivisions cost
+about two milliseconds of every player's frame, every frame, for as long as its wearer was in the room.
+The check never blocks a build. It names the setting to change in the Skeletal Mesh Editor's Clothing
+tab: a simulation mesh of about a thousand particles, Iteration Count 1, Subdivision Count 1, Self
+Collision off. Cloth is still welcome; in game only the nearest few players' cloth simulates and the
+rest freezes in place, so a heavy dress mostly shows up frozen while a light one keeps moving for
+everyone. For hair and small pieces, bone-chain physics costs a fraction of cloth and looks the same.
+
+**From v0.4.13 — Blueprint nodes for building your own games.** The scripting API grows from a
 handful of nodes to about forty-five, all under **VR Realms** in the palette: who is in the realm,
 where each player is, points and labels everyone can read, messages and chat lines, teleport and
 respawn, a way for a button on one machine to reach the host, channels, screens and voice. Add the
