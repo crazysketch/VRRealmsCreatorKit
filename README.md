@@ -1,10 +1,10 @@
-# VR Realms Creator Kit — v0.4.12 (Alpha, UE 5.8)
+# VR Realms Creator Kit — v0.4.13 (Alpha, UE 5.8)
 
 Build maps and avatars for **VR Realms** and publish them to the Steam Workshop.
 You do **not** need Visual Studio, C++, or the VR Realms source — just Unreal
 Engine 5.8 and a Steam account that has VR Realms in its library.
 
-**New in v0.4.12 — Blueprint nodes for building your own games.** The scripting API grows from a
+**New in v0.4.13 — Blueprint nodes for building your own games.** The scripting API grows from a
 handful of nodes to about forty-five, all under **VR Realms** in the palette: who is in the realm,
 where each player is, points and labels everyone can read, messages and chat lines, teleport and
 respawn, a way for a button on one machine to reach the host, channels, screens and voice. Add the
@@ -15,6 +15,13 @@ Scripting API pages.
 
 **These nodes need the matching VR Realms update.** They appear in your palette now, and they do
 their work in-game once the game build that ships alongside this kit is live.
+
+**Avatars made in Blender or VRoid.** Prepare Avatar now refuses a mesh whose skeleton carries a
+baked scale. A metre-unit FBX puts a scale of 100 on the root bone, every preview looks fine, and the
+avatar is then posed about eighty metres in the air in game. The message names the bone and the exact
+Blender steps that fix it. Leg detection no longer mistakes skirt or hair bones for a calf, both hands
+get IK so they reach your controllers, the avatar is scaled to your eye height so the hands stay on
+them, and hair, skirts and tails no longer pull a limb into physics with them.
 
 Also in this release: Build refuses a map whose Blueprints use Execute Console Command, Open Level,
 Quit Game, Launch URL, Set Game Paused or the session nodes, and names the Blueprint and the node.
