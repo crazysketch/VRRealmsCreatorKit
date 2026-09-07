@@ -1,41 +1,29 @@
-# VR Realms Creator Kit — v0.4.14 (Alpha, UE 5.8)
+# VR Realms Creator Kit — v0.4.15 (Alpha, UE 5.8)
 
 Build maps and avatars for **VR Realms** and publish them to the Steam Workshop.
 You do **not** need Visual Studio, C++, or the VR Realms source — just Unreal
 Engine 5.8 and a Steam account that has VR Realms in its library.
 
-**New in v0.4.14 — the cloth check.** Validate now reads every clothing asset on an avatar and tells
-you what its simulation costs: how many particles it simulates, how many solver passes it runs per
-frame, and whether self collision is on. We measured it in a full room: bones, triangles and face
-shapes barely register, but one dress simulated on the full render mesh with five subdivisions cost
-about two milliseconds of every player's frame, every frame, for as long as its wearer was in the room.
-The check never blocks a build. It names the setting to change in the Skeletal Mesh Editor's Clothing
-tab: a simulation mesh of about a thousand particles, Iteration Count 1, Subdivision Count 1, Self
-Collision off. Cloth is still welcome; in game only the nearest few players' cloth simulates and the
-rest freezes in place, so a heavy dress mostly shows up frozen while a light one keeps moving for
-everyone. For hair and small pieces, bone-chain physics costs a fraction of cloth and looks the same.
-
-**From v0.4.13 — Blueprint nodes for building your own games.** The scripting API grows from a
-handful of nodes to about forty-five, all under **VR Realms** in the palette: who is in the realm,
-where each player is, points and labels everyone can read, messages and chat lines, teleport and
-respawn, a way for a button on one machine to reach the host, channels, screens and voice. Add the
-**Realm Events** component to any actor to react to players arriving and leaving, points changing,
-public chat, channels and the built-in game modes. A scoreboard marker in a map with no game mode
-now lists everyone's points. The full tables, including what is replicated, are on the site's
-Scripting API pages.
+**New in v0.4.15 — animation and input for your own games.** Both came out of building a complete
+boxing game with nothing but this kit, and both are now nodes under **VR Realms** in the palette.
+**Play Animation On Player (Server)** plays an animation sequence on a player's avatar body for
+everyone: any clip authored on a mannequin-style skeleton works, because the game maps its bones onto
+whatever avatar the player wears, and it returns the clip's length so you can wait for it. **Stop
+Player Animation** and **Is Player Animating** go with it, and the **Realm Events** component gains
+**On Player Animation Finished**. Headset players' arms keep following their real hands, so on a
+headset it is for legs, spine and full-body emotes; on desktop it is the whole body. **On Player
+Action** on Realm Events hands you a button press or release from the player at this machine, with
+one device-agnostic name per action: Fire, FireLeft, Grab, GrabLeft, Jump, Crouch, Sprint, Interact,
+Menu, Aim, ButtonB, ButtonY, StickLeft, StickRight. No Enable Input, no key events, and it reads the
+same for a headset, a keyboard and a gamepad. **Is Action Held** reads the current state. Input never
+leaves a machine, so act on it with Tell Host. The full game, rule by rule, is written up at
+<https://vr-realms.com/docs/api-boxing.html>; the node tables are at
+<https://vr-realms.com/docs/api-nodes.html>.
 
 **These nodes need the matching VR Realms update.** They appear in your palette now, and they do
-their work in-game once the game build that ships alongside this kit is live.
-
-**Avatars made in Blender or VRoid.** Prepare Avatar now refuses a mesh whose skeleton carries a
-baked scale. A metre-unit FBX puts a scale of 100 on the root bone, every preview looks fine, and the
-avatar is then posed about eighty metres in the air in game. The message names the bone and the exact
-Blender steps that fix it. Leg detection no longer mistakes skirt or hair bones for a calf, both hands
-get IK so they reach your controllers, the avatar is scaled to your eye height so the hands stay on
-them, and hair, skirts and tails no longer pull a limb into physics with them.
-
-Also in this release: Build refuses a map whose Blueprints use Execute Console Command, Open Level,
-Quit Game, Launch URL, Set Game Paused or the session nodes, and names the Blueprint and the node.
+their work in-game once the game build that ships alongside this kit is live. Everything from
+0.4.13 and 0.4.14 (the scripting nodes, the Blender and VRoid fixes, the cloth check) is folded into
+the sections below.
 
 The sample content has not changed, so VRR Updater brings you up to date with the small patch.
 
@@ -95,6 +83,21 @@ every later upload runs silently.
 - Don't worry about which skeleton asset you pick in the FBX import dialog — even if
   you leave it empty or your pack ships its own skeleton, the tool detects the right
   mannequin (UE4 vs UE5) and re-assigns your mesh automatically.
+- **Made in Blender or VRoid?** Export with Unit Scale 0.01 and Apply Scale, or the root bone
+  carries a scale of 100: every preview looks right and the avatar stands about eighty metres in the
+  air in game. Prepare Avatar refuses such a skeleton and names the bone and the Blender steps. Leg
+  detection takes the lowest branch (skirt and hair bones are not calves), both hands get IK so they
+  reach your controllers, the avatar is scaled to your eye height, and hair, skirts and tails no
+  longer pull a limb into physics with them.
+- **Cloth costs everyone.** Validate reads every clothing asset and prints its simulation cost. Up to
+  about 1,500 simulated particles with Iteration Count and Subdivision Count of 2 or less and Self
+  Collision off is fine; more than 3,000 particles, more passes, or self collision is marked HEAVY.
+  One such dress cost about two milliseconds of every player's frame, every frame. The check never
+  blocks a build. Fix it in the Skeletal Mesh Editor's Clothing tab: simulate a low-poly copy of the
+  garment, Iteration Count 1, Subdivision Count 1, Self Collision off. In game only the nearest few
+  players' cloth simulates and the rest freezes in place, so a heavy dress mostly shows up frozen
+  while a light one keeps moving for everyone. For hair, tails and small pieces, bone-chain physics
+  costs a fraction of cloth and looks the same.
 
 ### Upload an avatar
 
@@ -138,7 +141,20 @@ dropdown in *Details → VR Realms*. The placeholder takes that item's real size
 which way it faces. The same panel has **Game mode**, **Match role** and **Movement mode**
 dropdowns, and the **Game device** dropdown (scoring zones, ball homes, round rules)
 turns a map into a volleyball, soccer or lap-race game with no scripting. Guides:
-<https://vr-realms.com/interactables.php> and <https://vr-realms.com/game-modes.php>.
+<https://vr-realms.com/docs/interactables.html> and <https://vr-realms.com/docs/game-modes.html>.
+
+**Your own game logic.** When tags and devices do not cover it, a map can ship Blueprints you
+wrote, and the **Scripting API** is how they reach the players and the room: about fifty nodes under
+**VR Realms** in the palette plus the **Realm Events** component. Who is here and where each player
+is, points and labels everyone can read, messages and chat lines, teleport and respawn, a way for a
+press on one machine to reach the host, channels, screens, voice, animation and input. Every node
+says where it runs: Local nodes read this machine's copy, Server nodes act on the host only, and a
+trigger's overlap fires on the host for every player who walks in, so most gameplay needs no
+networking nodes at all. A scoreboard marker in a map with no game mode lists everyone's points.
+Build refuses a map whose Blueprints use Execute Console Command, Open Level, Quit Game, Launch
+URL, Set Game Paused or the session nodes, and names the Blueprint and the node. Tables and worked
+scenarios: <https://vr-realms.com/docs/api.html>. A complete game built this way, rule by rule:
+<https://vr-realms.com/docs/api-boxing.html>.
 
 > If the editor pops a dialog saying *"Source code, config INI, and text files may
 > need Find/Replace… Continue with rename?"* — click **OK**. That's a generic Unreal
@@ -177,6 +193,8 @@ subscribers get it automatically.
 | Your avatar, or just its face, is plain grey in game | Update the kit, press Build again and re-upload. Older kits packed materials without their parent, or without the *Used with Morph Targets* switch a face needs; the validator now warns about both before upload. |
 | Content looks right on a flat screen but is **black in the right eye**, or every material is a grey checkerboard | Your project's renderer settings drifted from the kit's (instanced stereo off, or no SM5 shaders). Build now refuses to cook in that state and lists each line. Restore the kit's `Config/DefaultEngine.ini` (VRR Updater → **Verify files** → **Repair**) and rebuild. |
 | *EResult 3* while setting tags | Steam could not reach its servers. Check Steam is online; the call is retried once on its own. |
+| *Build refused: Blueprint '…' uses Execute Console Command / Open Level / Quit Game / …* | Those nodes act on the whole game rather than your map. Remove them from the named Blueprint and Build again. The allowed nodes are on the Scripting API pages. |
+| A node from this kit does nothing in game, or a Blueprint using it will not load | The game build that ships alongside this kit is not out yet, or the player is on an older game version. Nodes marked *next* on the docs pages need the matching VR Realms update. |
 
 ## Rules / standards
 
