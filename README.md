@@ -1,28 +1,30 @@
-# VR Realms Creator Kit — v0.4.15 (Alpha, UE 5.8)
+# VR Realms Creator Kit — v0.4.16 (Alpha, UE 5.8)
 
 Build maps and avatars for **VR Realms** and publish them to the Steam Workshop.
 You do **not** need Visual Studio, C++, or the VR Realms source — just Unreal
 Engine 5.8 and a Steam account that has VR Realms in its library.
 
-**New in v0.4.15 — animation and input for your own games.** Both came out of building a complete
-boxing game with nothing but this kit, and both are now nodes under **VR Realms** in the palette.
-**Play Animation On Player (Server)** plays an animation sequence on a player's avatar body for
-everyone: any clip authored on a mannequin-style skeleton works, because the game maps its bones onto
-whatever avatar the player wears, and it returns the clip's length so you can wait for it. **Stop
-Player Animation** and **Is Player Animating** go with it, and the **Realm Events** component gains
-**On Player Animation Finished**. Headset players' arms keep following their real hands, so on a
-headset it is for legs, spine and full-body emotes; on desktop it is the whole body. **On Player
-Action** on Realm Events hands you a button press or release from the player at this machine, with
-one device-agnostic name per action: Fire, FireLeft, Grab, GrabLeft, Jump, Crouch, Sprint, Interact,
-Menu, Aim, ButtonB, ButtonY, StickLeft, StickRight. No Enable Input, no key events, and it reads the
-same for a headset, a keyboard and a gamepad. **Is Action Held** reads the current state. Input never
-leaves a machine, so act on it with Tell Host. The full game, rule by rule, is written up at
-<https://vr-realms.com/docs/api-boxing.html>; the node tables are at
-<https://vr-realms.com/docs/api-nodes.html>.
+**New in v0.4.16 — play your map before you upload it.** The panel gains a **Play Map** button.
+It cooks your map exactly as an upload would, then launches your installed copy of VR Realms straight
+into it, skipping the intro and the hub. What you walk around in is byte-identical to what would go to
+the Workshop, so the faults that only appear after a cook — grey materials, the right-eye-black
+shader bug — show up here instead of in front of players. Pick **VR** or **Desktop** from the split
+button; the pak's build time sits beside it so you can tell a stale build from a fresh one. It runs
+offline and mounts only your own map.
 
-**These nodes need the matching VR Realms update.** They appear in your palette now, and they do
-their work in-game once the game build that ships alongside this kit is live. Everything from
-0.4.13 and 0.4.14 (the scripting nodes, the Blender and VRoid fixes, the cloth check) is folded into
+Once you are in, type **`/spawn bot 1`** in chat to add a test player at your map's spawn point. It
+arrives the way a real joiner does, with its own PlayerState, so scoreboards, game modes and
+join-triggered scripting can be exercised alone. It is refused outside Play Map, so it can never
+reach a live room.
+
+**Cloth is now a hard limit, not a warning.** 0.4.14 warned about heavy Chaos cloth; an avatar over
+**1,500 simulation particles** is now refused at Validate and cannot be uploaded. A single dress at
+8,000 particles took a full room to 17 fps in testing, and the cost lands on everybody who can see
+you, not on you. Build the shape with fewer particles or bake it into the mesh. The message names the
+number it measured and what the limit is.
+
+Everything from 0.4.13, 0.4.14 and 0.4.15 (the scripting nodes, the animation and input nodes, the
+Blender and VRoid fixes, the cloth check) is folded into
 the sections below.
 
 The sample content has not changed, so VRR Updater brings you up to date with the small patch.
