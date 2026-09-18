@@ -1,10 +1,27 @@
-# VR Realms Creator Kit — v0.4.16 (Alpha, UE 5.8)
+# VR Realms Creator Kit — v0.4.17 (Alpha, UE 5.8)
 
 Build maps and avatars for **VR Realms** and publish them to the Steam Workshop.
 You do **not** need Visual Studio, C++, or the VR Realms source — just Unreal
 Engine 5.8 and a Steam account that has VR Realms in its library.
 
-**New in v0.4.16 — play your map before you upload it.** The panel gains a **Play Map** button.
+**New in v0.4.17 — put the controls where you want them.** Two new items in the **Item**
+dropdown, for the same problem in two places: a screen's control bar hangs under the screen, and a
+mirror's panel sits beside the mirror. Both are right on a wall and wrong the moment the thing
+stands on furniture, where the controls end up inside the cabinet.
+
+**Video Bar Layout** moves a screen's play/paste bar. **Mirror Widget** moves a mirror's power and
+resolution panel. Drop one where the controls should float, point it at its screen or mirror with
+the eyedropper — the row is called **Bar for** / **Panel for**, the same wiring a Button already
+uses — and the controls appear there instead. The ghost shows the real footprint and the arrow
+shows which way it will face, so turn it towards your players. Scale it to size the controls.
+
+Add neither and nothing changes: the bar stays under the screen and the panel beside the mirror,
+exactly as before. One per screen or mirror — with several, give each pair its own link.
+
+⚠ **Both need the VR Realms client from 2026-09-18 or later.** On an older client the item does not
+resolve and the controls stay where they always were. Nothing breaks; the marker simply does nothing.
+
+**Previously, in v0.4.16 — play your map before you upload it.** The panel gains a **Play Map** button.
 It cooks your map exactly as an upload would, then launches your installed copy of VR Realms straight
 into it, skipping the intro and the hub. What you walk around in is byte-identical to what would go to
 the Workshop, so the faults that only appear after a cook — grey materials, the right-eye-black
