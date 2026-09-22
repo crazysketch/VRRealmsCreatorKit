@@ -12,7 +12,7 @@
         (prev.txt = `unzip -Z1 <previous full zip> | sort` — prints what was
          added/removed against the last release so nothing sneaks in or drops out)
 
-    Excludes, same list as every release since 0.4.7: .git, _release, CLAUDE.md,
+    Excludes, same list as every release since 0.4.7: .git, _release, *.private.md,
     Intermediate/obj/Saved/DerivedDataCache/Build, .vs, *.pdb, *.py, *.log,
     and Tools\release-notes-*.md (those go on the release page, not in the kit).
 #>
@@ -39,7 +39,7 @@ $files = Get-ChildItem $KitRoot -Recurse -File -Force | Where-Object {
     -not ($rel -match '^(\.git|_release|Intermediate|Saved|DerivedDataCache|Build)(\\|$)') -and
     -not ($rel -match '\\(Intermediate|obj|Saved|DerivedDataCache|Build)\\') -and
     -not ($rel -match '(^|\\)\.vs(\\|$)') -and
-    $rel -ne 'CLAUDE.md' -and
+    -not ($rel -match '\.private\.md$') -and
     -not ($rel -match '^Tools\\release-notes-.*\.md$') -and
     $_.Extension -notin @('.pdb', '.py', '.log', '.tmp')
 }
