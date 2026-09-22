@@ -31,11 +31,16 @@ If you do not agree, do not use the kit.
   VR Realms User Agreement shown in the game.
 - Content that breaks those terms, or that a rights holder asks us to remove, may be taken down.
 
-## 4. Third-party content
+## 4. Third-party content and software
 
 Some example content in the kit comes from third parties and is included under their licenses.
 It is licensed to you only for use inside VR Realms Workshop items, and may not be extracted or
 reused elsewhere. The Unreal Engine itself is subject to the Unreal Engine EULA from Epic Games.
+
+The kit includes **Kawaii Physics** by pafuhana1213, used for avatar secondary motion (tails, ears,
+hair). It is not ours: it is licensed under the MIT License, and its copyright and permission notice
+ship unchanged in `VRRealms/Plugins/KawaiiPhysics/LICENSE`. Nothing in this license restricts what
+you may do with Kawaii Physics itself; the MIT License governs it.
 
 ## 5. No warranty
 
