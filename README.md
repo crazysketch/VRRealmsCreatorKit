@@ -1,227 +1,126 @@
-# VR Realms Creator Kit — v0.4.18 (Alpha, UE 5.8)
+# VR Realms Creator Kit
 
-Build maps and avatars for **VR Realms** and publish them to the Steam Workshop.
-You do **not** need Visual Studio, C++, or the VR Realms source — just Unreal
-Engine 5.8 and a Steam account that has VR Realms in its library.
+**v0.4.18 (Alpha)** · Unreal Engine **5.8**
 
-**New in v0.4.18 — two doors, and one button.** The Workshop panel opens on a front page: the logo,
-then two cards, **Worlds** and **Avatars**. Pick the one you make and you get a page with only that,
-a **← Home** button, and Guide / Forum / Discord links on the card. Settings stays on the front page so
-a first run cannot miss it, and now explains what each row is for.
+Build maps and avatars for [VR Realms](https://vr-realms.com) and publish them to the Steam Workshop.
 
-**Avatars: Build does it all.** **Build Avatar Pak** prepares the avatar itself — a non-mannequin
-skeleton is worked out from its shape and physics is added to tails, ears and hair if there is none —
-so you no longer press Prepare first. Re-check and Prepare Avatar moved under **Advanced**, next to a
-new **Remove physics** button for avatars that should stay still (it stays removed on later builds).
-MetaHuman → Avatar is folded into an expandable marked experimental.
+No Visual Studio, no C++, no game source needed. Just Unreal Engine 5.8 and a Steam account that owns VR Realms.
 
-**The publish form, sorted.** Title, description, preview, Workshop ID, change note and tags live in
-one **Steam Workshop info** box with **Upload** inside it; **Build** sits above it (with Play Map on
-Worlds). The log is resizable — drag the bar.
+> ⚠️ **Known issue (fix already in the next game update):** do **not** place a **Mirror Widget** item yet. Entering a map that has one crashes the current Steam build. Plain mirrors are fine. Remove the widget marker and rebuild until the update lands.
 
-**Tags that stick.** Uploading signs SteamCMD in as your account, which knocks the Steam app offline
-for a moment; tags go through the Steam app, so tagging after an upload often failed until you signed
-back in. When you **update** an item whose Workshop ID is filled in, the ticked tags are now applied
-**before** the upload while Steam is still connected. A brand-new item still tags afterwards; if that
-refuses, sign out of Steam and back in, then press Set Tags again.
+---
 
-**More nodes refused in Workshop maps** (the game checks the same list when it loads a map from the
-next client update): save-slot reads/writes/deletes, Kick/Ban Player, Set Global Time Dilation, the
-Game User Settings family, Enable HMD / Set Tracking Origin / Reset Orientation and Position,
-Client/Server Travel and Return to Main Menu, and the string-to-path conversions plus Async Load
-Class Asset. Full list in the release notes.
+## Quick Start
 
-**VRR Updater** now runs **Verify files** right after installing a release. It only looks; Repair
-stays a separate button that backs up first. Your maps and avatars are never touched.
+1. Install **Unreal Engine 5.8** (Epic Games Launcher)
+2. Unzip the kit somewhere with a short path
+3. Open `VRRealms/VRRealms.uproject`
+4. Go to **Tools → VR Realms Workshop**
+5. In **Settings**, download SteamCMD and do the one-time Steam login
+6. Build → Upload
 
-The sample content has not changed, so VRR Updater brings you up to date with the small patch.
+Full details → [Workshop panel guide](https://vr-realms.com/docs/ugc-tools-panel.html)
 
-- Full step-by-step guides: **https://vr-realms.com** (Maps & Avatars)
-- Latest version / downloads: **https://github.com/crazysketch/VRRealmsCreatorKit/releases**
-- Help & feedback: Discord → `#workshop-support`
+---
 
-> This is an **alpha** kit — expect updates. Grab the newest release before starting a big project.
+## Avatars
 
-## 1. Install
+- Standard UE4 / UE5 mannequin skeletons work out of the box
+- Other humanoid rigs → **Build** works the bones out from the shape (no separate Prepare step)
+- Physics for hair, tails, ears, etc. is added automatically when needed; **Advanced → Remove physics** if you want a still avatar
+- Extra bones (hair, tails, wings…) are supported on UE4-style rigs
+- Heavy cloth is refused: max **1,500 simulation particles** per clothing asset. Simulate a low-poly copy or remove the clothing data
 
-1. Install **Unreal Engine 5.8** from the Epic Games Launcher (free).
-2. Unzip this kit anywhere (avoid very deep folder paths).
-3. Open `VRRealms/VRRealms.uproject` in UE 5.8. The Workshop tool is already
-   installed as a plugin — open it from the top menu bar: **Tools → VR Realms Workshop**.
-4. Uploads run through **SteamCMD**. You do not need to find it yourself: the Settings
-   panel has a **Download SteamCMD** button that fetches it from Valve into `C:\steamcmd`
-   and fills in the path. If it is already there, the button adopts it.
-5. Later, get new kit versions with **`VRRUpdater.cmd`**: double-click it with Unreal
-   closed, and a window lists every release, marks the one you have, and installs the
-   one you pick, usually as a small patch. A release that changes the sample content
-   says so and needs the full kit download instead. The updater only writes to the
-   kit's plugin folder and to itself, and backs up your current tools first. Your maps
-   and avatars are never touched. Its **Verify files** button checks every file the kit
-   shipped, and **Repair** restores the ones that are modified or missing.
+Full details + troubleshooting → [Build an Avatar](https://vr-realms.com/docs/workshop-avatars.html)
 
-## 2. One-time Steam login (do this first, or uploads will fail)
+---
 
-In **Tools → VR Realms Workshop → Settings**: click **Download SteamCMD** if the path
-box is empty, enter your Steam login name, and click **Steam Login (one time)**. A console window opens —
-type your password and Steam Guard code there. Steam remembers you afterwards, so
-every later upload runs silently.
+## Maps
 
-## 3. Avatars
+1. Make your level and place a **PlayerStart**
+2. Tools → VR Realms Workshop → **Worlds** → pick your level
+3. Build Map Pak → fill in info → Upload
 
-### The skeleton rules (read this once, it saves you a re-upload)
+Interactables (screens, jukeboxes, mirrors, game devices, etc.) are dropped in with `BP_VRItemMarker`.
+Want game logic? See the [Scripting API](https://vr-realms.com/docs/api.html) for the allowed nodes.
 
-- A character **rigged to the standard Epic mannequin skeleton**, either the **UE4**
-  or the **UE5** version, is driven directly and needs no preparation. Most
-  marketplace/Fab characters advertised as "rigged to the Epic skeleton" work as-is.
-- **Rigged some other way?** Press **Prepare Avatar** in the Avatar tab. It works out
-  where the spine, arms, legs and fingers are from the shape of the skeleton rather
-  than from bone names, so it does not matter what your hips are called. It also adds
-  physics for anything loose (tails, ears, hair, cloth) as an ordinary Animation
-  Blueprint you can edit or throw away, and prints every chain it found with a
-  verdict. Pressing it twice is safe: existing physics is never overwritten, and a
-  mannequin rig is left alone. This needs the full kit download rather than the
-  updater patch, because the physics plugin cannot ship in a patch.
-- The core humanoid bones are **required**: pelvis, spine, neck, head, clavicles,
-  arms, hands, thighs, calves, feet. If your rig has no equivalent of these, no tool
-  can fix it — re-rig in Blender/Maya first.
-- **Extra bones are totally fine** — eyes, jaw, hair, ears, tails, wings, whatever.
-  You don't have to do anything: the tool detects them and **automatically adds them**
-  (it builds a private copy of the mannequin skeleton for your avatar and merges the
-  extra bones in). *(Currently supported for UE4-skeleton rigs; UE5 rigs with extra
-  bones are not supported yet — the tool will tell you.)*
-- Don't worry about which skeleton asset you pick in the FBX import dialog — even if
-  you leave it empty or your pack ships its own skeleton, the tool detects the right
-  mannequin (UE4 vs UE5) and re-assigns your mesh automatically.
-- **Made in Blender or VRoid?** Export with Unit Scale 0.01 and Apply Scale, or the root bone
-  carries a scale of 100: every preview looks right and the avatar stands about eighty metres in the
-  air in game. Prepare Avatar refuses such a skeleton and names the bone and the Blender steps. Leg
-  detection takes the lowest branch (skirt and hair bones are not calves), both hands get IK so they
-  reach your controllers, the avatar is scaled to your eye height, and hair, skirts and tails no
-  longer pull a limb into physics with them.
-- **Cloth costs everyone.** Validate reads every clothing asset and prints its simulation cost. Up to
-  about 1,500 simulated particles with Iteration Count and Subdivision Count of 2 or less and Self
-  Collision off is fine; more than 3,000 particles, more passes, or self collision is marked HEAVY.
-  One such dress cost about two milliseconds of every player's frame, every frame. The check never
-  blocks a build. Fix it in the Skeletal Mesh Editor's Clothing tab: simulate a low-poly copy of the
-  garment, Iteration Count 1, Subdivision Count 1, Self Collision off. In game only the nearest few
-  players' cloth simulates and the rest freezes in place, so a heavy dress mostly shows up frozen
-  while a light one keeps moving for everyone. For hair, tails and small pieces, bone-chain physics
-  costs a fraction of cloth and looks the same.
+Full details + troubleshooting → [Build a Map](https://vr-realms.com/docs/maps-build.html) · [Interactables](https://vr-realms.com/docs/interactables.html)
 
-### Upload an avatar
+---
 
-1. Import your FBX (or install your Fab/marketplace pack) anywhere in the project.
-2. **Tools → VR Realms Workshop → Avatar** → pick your skeletal mesh in the dropdown.
-3. The tool checks it instantly and shows a colored verdict:
-   - 🟢 **READY — all checks passed.** Go ahead.
-   - 🟠 **FIXABLE — issues found, Build will fix them automatically.** Also go ahead —
-     this is normal for fresh imports and store packs (wrong folder, own skeleton,
-     extra bones…). The details are listed under the verdict if you're curious.
-   - 🔴 **INCOMPATIBLE — this avatar can NOT work in-game.** Usually missing core
-     bones. Nothing gets moved or changed; fix the rig in your 3D tool and re-import.
-4. If your mesh isn't in the kit's content folders yet, an **Item name** box appears —
-   that name becomes your item's folder and pak name. Pick a unique, final name
-   (changing it later means a new Workshop item).
-5. Click **Build Avatar Pak**. The log walks through every step: validating → moving
-   your files into the right folder → fixing the skeleton → cooking → building the pak.
-   The cook can take a few minutes and may *look* frozen during shader work — it isn't.
-6. Fill in **Title**, **Description**, a **Preview image** (jpg/png, under 1 MB or
-   Steam rejects it), tick the **Workshop tags** that fit, and click **Upload Avatar**.
-   Tags are applied as part of the upload. To change them later without re-uploading,
-   tick the new set and press **Set Tags on Steam**. The ticked boxes are the whole
-   list, so anything unticked is removed, and your Steam *client* must be signed in as
-   the account that owns the item. A **Personal** tag (the Access group) means only
-   you can wear it; other players still see you wearing it.
+## Updating an item
 
-## 4. Maps
+After the first successful upload the **Workshop ID** is filled in automatically.
+Leave it there: the next upload updates the existing item instead of creating a new one.
 
-1. Build your level. Drop a **PlayerStart** so players have somewhere to spawn.
-2. **Tools → VR Realms Workshop → Map** → pick your level in the dropdown.
-3. Same colored verdict as avatars. The most common warning is *"N assets outside the
-   map's Community folder"* — meshes/materials your map uses that live elsewhere in
-   the project. **Build moves them all in automatically**, so this is FIXABLE, not a
-   problem.
-4. Enter an **Item name** if asked (same rule: unique and final).
-5. Click **Build Map Pak** → fill in Title/Description/Preview, tick your tags → **Upload Map**.
+**Tags:** when updating an item, tags are applied *before* the upload while Steam is still connected. For a brand-new item they are applied afterwards; if Steam refuses, sign out of the Steam app and back in, then press Set Tags again.
 
-Screens, jukeboxes, drawing boards, mirrors, weapon pads, a drivable car: drag
-`VRRealms/Items/BP_VRItemMarker` into the level and pick the item from the **Item**
-dropdown in *Details → VR Realms*. The placeholder takes that item's real size and shows
-which way it faces. The same panel has **Game mode**, **Match role** and **Movement mode**
-dropdowns, and the **Game device** dropdown (scoring zones, ball homes, round rules)
-turns a map into a volleyball, soccer or lap-race game with no scripting. Guides:
-<https://vr-realms.com/docs/interactables.html> and <https://vr-realms.com/docs/game-modes.html>.
+---
 
-**Your own game logic.** When tags and devices do not cover it, a map can ship Blueprints you
-wrote, and the **Scripting API** is how they reach the players and the room: about fifty nodes under
-**VR Realms** in the palette plus the **Realm Events** component. Who is here and where each player
-is, points and labels everyone can read, messages and chat lines, teleport and respawn, a way for a
-press on one machine to reach the host, channels, screens, voice, animation and input. Every node
-says where it runs: Local nodes read this machine's copy, Server nodes act on the host only, and a
-trigger's overlap fires on the host for every player who walks in, so most gameplay needs no
-networking nodes at all. A scoreboard marker in a map with no game mode lists everyone's points.
-Build refuses a map whose Blueprints use Execute Console Command, Open Level, Quit Game, Launch
-URL, Set Game Paused or the session nodes, and names the Blueprint and the node. Tables and worked
-scenarios: <https://vr-realms.com/docs/api.html>. A complete game built this way, rule by rule:
-<https://vr-realms.com/docs/api-boxing.html>.
+## Important rules
 
-> If the editor pops a dialog saying *"Source code, config INI, and text files may
-> need Find/Replace… Continue with rename?"* — click **OK**. That's a generic Unreal
-> warning about maps referenced in config files, which Workshop maps never are.
+| Rule | Why |
+|------|-----|
+| **UE 5.8 only** | Required by the kit |
+| Keep the kit's `Config/DefaultEngine.ini` | Wrong renderer settings = black eye / broken materials |
+| **Do not enable Nanite** | VR Realms uses the forward renderer; Nanite meshes become invisible |
+| Bake lighting | Lumen does not run in the game |
+| Max pak size | **700 MB** |
+| One Community folder = one Workshop item | Forever. Do not reuse a folder for a different item |
 
-> You can't build the map you currently have **open** — the tool will ask you to
-> switch to another level first (File → New Level works).
+---
 
-## 5. Updating your item
+## FAQ / Common errors
 
-After a successful upload, the **Workshop ID** box fills in automatically — **leave
-it there**. With the ID filled, the next Upload **updates** your existing item and
-subscribers get it automatically.
-
-- **Empty ID = brand-new Workshop item.** Don't re-upload the same content as a new
-  item — two items built from the same folder break each other in-game.
-- New items are rate-limited by Steam (~10–15 per account per 24h). Updates are unlimited.
-- Items upload as **hidden/private**. Open the item's Steam Workshop page to set it
-  **Public** when it's ready — nobody can see or download a private item but you.
-- The kit tells vr-realms.com about your item the moment an upload succeeds, so it
-  reaches the review queue straight away, whatever Steam's search index shows.
-
-## 6. Errors to look for
+If it's not listed here, ask in [Discord](https://discord.com/invite/qMZ7gZzg6A).
 
 | What you see | What it means / what to do |
 |---|---|
-| 🔴 *INCOMPATIBLE … missing core bones* | The rig isn't a standard mannequin humanoid (renamed/missing pelvis, spine, arms…). Fix the rig in Blender/Maya, re-import. The tool deliberately touches nothing in this state. |
-| *Extra bones are currently only supported on the UE4 mannequin* | Your rig matched the UE5 skeleton AND has extra bones — not supported yet. Either remove the extra bones or re-rig on the UE4 mannequin. |
-| *The map '…' is currently open in the editor* | Open a different level, then Build again. |
-| *BUILD STOPPED — enter an item name first* | The Item name box is empty (letters/numbers/underscore only). |
-| Cook seems frozen for minutes | Normal during shader compilation. Truly stuck = 5+ min with no new log lines. |
-| *UPLOAD FAILED* + SteamCMD output in the log | Usually the one-time Steam login was never done (see §2), or Steam Guard expired — run the login again. |
-| SteamCMD *exit code 9* | Steam's new-item rate limit (~10–15/day). Wait, or update an existing item instead. |
-| *Pak is too large (max 700 MB)* | Reduce texture resolutions or remove unused assets, then rebuild. |
-| Your avatar shows as the default body (Quinn) in game | The game rejected the mesh — almost always a rig that bypassed the tool's checks via a manual upload. Re-run Validate in the kit and re-upload. |
-| Your avatar, or just its face, is plain grey in game | Update the kit, press Build again and re-upload. Older kits packed materials without their parent, or without the *Used with Morph Targets* switch a face needs; the validator now warns about both before upload. |
-| Content looks right on a flat screen but is **black in the right eye**, or every material is a grey checkerboard | Your project's renderer settings drifted from the kit's (instanced stereo off, or no SM5 shaders). Build now refuses to cook in that state and lists each line. Restore the kit's `Config/DefaultEngine.ini` (VRR Updater → **Verify files** → **Repair**) and rebuild. |
-| *EResult 3* while setting tags | Steam could not reach its servers. Check Steam is online; the call is retried once on its own. |
-| *Build refused: Blueprint '…' uses Execute Console Command / Open Level / Quit Game / …* | Those nodes act on the whole game rather than your map. Remove them from the named Blueprint and Build again. The allowed nodes are on the Scripting API pages. |
-| A node from this kit does nothing in game, or a Blueprint using it will not load | The game build that ships alongside this kit is not out yet, or the player is on an older game version. Nodes marked *next* on the docs pages need the matching VR Realms update. |
+| 🔴 **INCOMPATIBLE … missing core bones** | Rig is missing required bones (pelvis, spine, arms, legs, etc.). Re-rig in Blender/Maya and re-import. The tool does nothing in this state. |
+| Extra bones only supported on the UE4 mannequin | Your rig is UE5-style and has extra bones. Not supported yet. Remove the extra bones or re-rig on the UE4 mannequin. |
+| WARNING: forearm twist bones carry almost no skin weight | Wrists will pinch into a "bow-tie" in game. Paint weight onto the lowerarm_twist bones in your 3D tool, then re-upload. |
+| TOO EXPENSIVE: cloth over 1,500 particles | Simulate a low-poly copy of the garment, or remove the clothing data (the garment stays as normal skinned geometry). |
+| The map is currently open in the editor | You can't build the level that's open. Switch to a different level, then Build again. |
+| BUILD STOPPED: enter an item name first | Item name box is empty. Type a name (letters, numbers, underscore only). |
+| Cook seems frozen for minutes | Normal during shader compilation. Actually stuck = 5+ min with no new log lines. |
+| Build fails: file in use | Close the model's `.fbx` in your 3D tool or the mesh editor before building. |
+| UPLOAD FAILED + SteamCMD output | One-time Steam login was never done, or Steam Guard expired. Go to Settings → Steam Login and do it again. |
+| SteamCMD exit code 9 | Steam rate limit on new items (~10-15 per day). Wait, or update an existing item instead. |
+| Pak is too large (max 700 MB) | Lower texture resolutions or remove unused assets, then rebuild. |
+| Avatar shows as the default body (Quinn) | Game rejected the mesh. Usually means it skipped the kit's checks. Validate in the kit, then Build + Upload again. |
+| Avatar or face is plain grey | Older kits packed materials wrong. Update the kit, Build again, re-upload. |
+| Black in the right eye / grey checkerboard materials | Renderer settings drifted from the kit. VRR Updater → Verify files → Repair, then rebuild. |
+| Steam refused the tag update: access denied | The Steam app is signed into a different account than the one that uploaded. Sign the Steam app in as the uploader, then Set Tags again. |
+| EResult 3 while setting tags | Steam servers unreachable. Make sure Steam is online. The kit retries once on its own. |
+| Build refused: Blueprint uses Execute Console Command / Open Level / Quit Game / … | Those nodes affect the whole game, not just your map. Remove them and Build again. Allowed nodes are on the Scripting API pages. |
+| A node from this kit does nothing in game | Matching game update isn't out yet, or the player is on an older version. Nodes marked *next* on the docs need the matching VR Realms update. |
+| Map has a Mirror Widget and the game crashes on entry | Known issue in the current Steam build, fixed in the next update. Remove the Mirror Widget marker for now. |
 
-## Rules / standards
+---
 
-- Engine: **UE 5.8** only.
-- Avatars: standard **UE4 or UE5 mannequin** rig, or any humanoid rig after **Prepare Avatar** (see §3 — extra bones welcome).
-- **Keep the kit's `Config/DefaultEngine.ini`.** Those lines decide what your cooked shaders
-  contain, and Build refuses to cook if they drifted from the game's. Using GPU Lightmass?
-  It needs SM6 and ray tracing in the editor: bake with them on, then put the kit's file
-  back before you Build. Your baked lighting stays with the map. The comments in that
-  file spell it out.
-- **Do NOT enable Nanite on your meshes.** VR Realms uses the VR forward renderer,
-  and Nanite only works with deferred rendering — Nanite-enabled meshes will be
-  **invisible in game**. When importing, leave "Build Nanite" OFF; for existing
-  assets, right-click the mesh → disable Nanite. Use normal LODs to control poly
-  count instead.
-- **Maps: bake your lighting** (Build → Lighting Quality → *Production*). VR Realms uses
-  the VR forward renderer, so **Lumen does not run** — use Static/Stationary lights and a
-  Lightmass Importance Volume. For sky, use SkyAtmosphere + a Directional Light with
-  "Atmosphere Sun Light" (avoid HDRI sky-dome meshes — they often render black).
-- Pak size limit: **700 MB**.
-- One Community folder = one Workshop item, forever.
+## Updating the kit
+
+Run **VRR Updater** (`VRRUpdater.cmd`). It installs the latest release, then runs **Verify files** so drifted settings are caught. Repair is a separate button that backs up first. Your maps and avatars are never touched.
+
+What changed in each version → [Release notes](https://github.com/crazysketch/VRRealmsCreatorKit/releases)
+
+---
+
+## Credits & Third-party
+
+This kit uses **[KawaiiPhysics](https://github.com/pafuhana1213/KawaiiPhysics)** by [pafuhana1213](https://github.com/pafuhana1213) for soft-body / bone-chain physics on avatars (hair, tails, ears, cloth, etc.).
+
+**All rights to KawaiiPhysics remain with its author under the [MIT License](https://github.com/pafuhana1213/KawaiiPhysics/blob/master/LICENSE).**
+We only use it; we do not claim ownership of it.
+
+The kit itself is © 2026 Sketchy Realms. See [LICENSE.md](LICENSE.md): use it to make VR Realms content, keep what you make, don't redistribute the kit.
+
+---
+
+## Links
+
+- **Website & full guides** → [vr-realms.com](https://vr-realms.com)
+- **Releases / downloads** → [GitHub Releases](https://github.com/crazysketch/VRRealmsCreatorKit/releases)
+- **Help** → [Discord](https://discord.com/invite/qMZ7gZzg6A) · [Forum](https://vr-realms.com/forum/public/)
+
+> This is an **alpha** kit. Always grab the newest release before starting a big project.
