@@ -39,6 +39,10 @@
 		{
 			"Name": "ChaosCloth",
 			"Enabled": true
+		},
+		{
+			"Name": "GeometryProcessing",
+			"Enabled": true
 		}
 	]
 }

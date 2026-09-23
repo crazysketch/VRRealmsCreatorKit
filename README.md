@@ -87,6 +87,7 @@ If it's not listed here, ask in [Discord](https://discord.com/invite/qMZ7gZzg6A)
 | UPLOAD FAILED + SteamCMD output | One-time Steam login was never done, or Steam Guard expired. Go to Settings → Steam Login and do it again. |
 | SteamCMD exit code 9 | Steam rate limit on new items (~10-15 per day). Wait, or update an existing item instead. |
 | Pak is too large (max 700 MB) | Lower texture resolutions or remove unused assets, then rebuild. |
+| UE4 / UE5 mannequin avatar has a twisted or broken neck, arms or legs in game | The rig uses mannequin bone names but its bones are rotated differently. Press **Advanced → Map Community Rig**, then Build again. |
 | Avatar shows as the default body (Quinn) | Game rejected the mesh. Usually means it skipped the kit's checks. Validate in the kit, then Build + Upload again. |
 | Avatar or face is plain grey | Older kits packed materials wrong. Update the kit, Build again, re-upload. |
 | Black in the right eye / grey checkerboard materials | Renderer settings drifted from the kit. VRR Updater → Verify files → Repair, then rebuild. |
