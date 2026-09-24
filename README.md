@@ -1,6 +1,6 @@
 # VR Realms Creator Kit
 
-**v0.4.18 (Alpha)** · Unreal Engine **5.8**
+**v0.4.19 (Alpha)** · Unreal Engine **5.8**
 
 Build maps and avatars for [VR Realms](https://vr-realms.com) and publish them to the Steam Workshop.
 
@@ -30,6 +30,8 @@ Full details → [Workshop panel guide](https://vr-realms.com/docs/ugc-tools-pan
 - Physics for hair, tails, ears, etc. is added automatically when needed; **Advanced → Remove physics** if you want a still avatar
 - Extra bones (hair, tails, wings…) are supported on UE4-style rigs
 - Heavy cloth is refused: max **1,500 simulation particles** per clothing asset. Simulate a low-poly copy or remove the clothing data
+- **Play Avatar** runs the real game with your built avatar on you, before you upload (needs the current VR Realms update)
+- A UE4 / UE5 mannequin avatar with a twisted neck or limbs: **Advanced → Map Community Rig**, then Build again
 
 Full details + troubleshooting → [Build an Avatar](https://vr-realms.com/docs/workshop-avatars.html)
 
@@ -80,6 +82,7 @@ If it's not listed here, ask in [Discord](https://discord.com/invite/qMZ7gZzg6A)
 | Extra bones only supported on the UE4 mannequin | Your rig is UE5-style and has extra bones. Not supported yet. Remove the extra bones or re-rig on the UE4 mannequin. |
 | WARNING: forearm twist bones carry almost no skin weight | Wrists will pinch into a "bow-tie" in game. Paint weight onto the lowerarm_twist bones in your 3D tool, then re-upload. |
 | TOO EXPENSIVE: cloth over 1,500 particles | Simulate a low-poly copy of the garment, or remove the clothing data (the garment stays as normal skinned geometry). |
+| WARNING: cloth that will NOT move in game | The clothing data exists but is not applied to any part of the mesh. Open the mesh → Clothing tab → select the section → Apply the clothing data, or re-import the original mesh, then Build again. |
 | The map is currently open in the editor | You can't build the level that's open. Switch to a different level, then Build again. |
 | BUILD STOPPED: enter an item name first | Item name box is empty. Type a name (letters, numbers, underscore only). |
 | Cook seems frozen for minutes | Normal during shader compilation. Actually stuck = 5+ min with no new log lines. |
