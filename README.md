@@ -1,6 +1,6 @@
 # VR Realms Creator Kit
 
-**v0.4.20 (Alpha)** · Unreal Engine **5.8**
+**v0.4.21 (Alpha)** · Unreal Engine **5.8**
 
 Build maps and avatars for [VR Realms](https://vr-realms.com) and publish them to the Steam Workshop.
 
@@ -51,6 +51,10 @@ Music, SFX, Ambience, Dialog or TV / Media. Left "Not connected", only the Maste
 from a Blueprint: set the audio component's **Sound Class Override**, or the sound asset's own **Sound Class**, to one
 of `/Game/VRRealms/Sounds/SC_Music`, `SC_SFX`, `SC_Ambience`, `SC_Dialog` or `SC_Media`. Map validation lists every
 placed sound still on Master only. (The preview in the editor always plays at full volume.)
+
+**Props that go back to their spot:** on a Grabbable mesh, tick Details → **VR Realms → Returns to its spot**. If players
+leave it somewhere else and nobody holds it, it dissolves and materializes back where you placed it after the time you
+set (60 seconds unless you change it). Everyone sees it. Good for drinks, tools, anything that should not end up scattered.
 
 Full details + troubleshooting → [Build a Map](https://vr-realms.com/docs/maps-build.html) · [Interactables](https://vr-realms.com/docs/interactables.html)
 
