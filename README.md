@@ -1,6 +1,6 @@
 # VR Realms Creator Kit
 
-**v0.4.19 (Alpha)** · Unreal Engine **5.8**
+**v0.4.20 (Alpha)** · Unreal Engine **5.8**
 
 Build maps and avatars for [VR Realms](https://vr-realms.com) and publish them to the Steam Workshop.
 
@@ -45,6 +45,12 @@ Full details + troubleshooting → [Build an Avatar](https://vr-realms.com/docs/
 
 Interactables (screens, jukeboxes, mirrors, game devices, etc.) are dropped in with `BP_VRItemMarker`.
 Want game logic? See the [Scripting API](https://vr-realms.com/docs/api.html) for the allowed nodes.
+
+**Sounds and the players' volume sliders:** select an Ambient Sound → Details → **VR Realms → Volume slider** and pick
+Music, SFX, Ambience, Dialog or TV / Media. Left "Not connected", only the Master slider turns it down. Sounds played
+from a Blueprint: set the audio component's **Sound Class Override**, or the sound asset's own **Sound Class**, to one
+of `/Game/VRRealms/Sounds/SC_Music`, `SC_SFX`, `SC_Ambience`, `SC_Dialog` or `SC_Media`. Map validation lists every
+placed sound still on Master only. (The preview in the editor always plays at full volume.)
 
 Full details + troubleshooting → [Build a Map](https://vr-realms.com/docs/maps-build.html) · [Interactables](https://vr-realms.com/docs/interactables.html)
 
