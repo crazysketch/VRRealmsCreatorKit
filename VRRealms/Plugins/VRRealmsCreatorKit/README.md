@@ -13,9 +13,11 @@ external tool could never do.
      skeletons actually have), required-core-bones check (pelvis/spine/arms/legs/head),
      polluted-kit-skeleton detection, wrong/orphan-skeleton detection
      (`SKEL_<MeshName>` from an FBX import with the Skeleton field left empty) with
-     auto-pick of the right mannequin (UE4 vs UE5) by bone overlap. A rig that can't
-     work (missing core bones, extra bones on a non-UE4 base) stops the build HERE —
-     nothing gets moved or modified.
+     auto-pick of the right mannequin (UE4 vs UE5) by bone overlap. A rig whose core
+     bones don't use mannequin names (e.g. `Hips`, `Left arm` from a Blender rig) is
+     NOT refused — Build's Prepare step maps it by skeleton shape and the game drives
+     it by retargeting. Only a rig no tooling can save stops the build HERE — nothing
+     gets moved or modified.
   2. **Adopt** — if the mesh lives outside `Community/Avatars/<Name>/` (e.g. a Fab
      purchase), moves it + everything it references (materials, textures, physics
      asset...) into the item's folder named by the *Item name* box, preserving the

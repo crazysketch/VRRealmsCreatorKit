@@ -1,6 +1,6 @@
 # VR Realms Creator Kit
 
-**v0.4.21 (Alpha)** · Unreal Engine **5.8**
+**v0.4.22 (Alpha)** · Unreal Engine **5.8**
 
 Build maps and avatars for [VR Realms](https://vr-realms.com) and publish them to the Steam Workshop.
 
@@ -88,8 +88,8 @@ If it's not listed here, ask in [Discord](https://discord.com/invite/qMZ7gZzg6A)
 
 | What you see | What it means / what to do |
 |---|---|
-| 🔴 **INCOMPATIBLE … missing core bones** | Rig is missing required bones (pelvis, spine, arms, legs, etc.). Re-rig in Blender/Maya and re-import. The tool does nothing in this state. |
-| Extra bones only supported on the UE4 mannequin | Your rig is UE5-style and has extra bones. Not supported yet. Remove the extra bones or re-rig on the UE4 mannequin. |
+| 🟠 **NEEDS MAPPING — not an Unreal mannequin rig** | Your rig uses its own bone names (e.g. `Hips`, `Spine`, `Left arm`). That's fine — press **Build Avatar Pak** and it maps the skeleton by its shape automatically. No renaming or re-rigging needed. (Older kits showed this as red "BLOCKED … missing core bones" — same fix: just press Build.) |
+| **Bone '…' has a scale of 100.00 baked into the skeleton** | The FBX was exported from Blender in metres (its default). In Blender: Scene Properties → Units → **Unit Scale = 0.01**, select the armature and all meshes, press **S, 100, Enter**, then **Ctrl+A → Apply → Scale**. Export the FBX again and reimport the mesh from the new file. |
 | WARNING: forearm twist bones carry almost no skin weight | Wrists will pinch into a "bow-tie" in game. Paint weight onto the lowerarm_twist bones in your 3D tool, then re-upload. |
 | TOO EXPENSIVE: cloth over 1,500 particles | Simulate a low-poly copy of the garment, or remove the clothing data (the garment stays as normal skinned geometry). |
 | WARNING: cloth that will NOT move in game | The clothing data exists but is not applied to any part of the mesh. Open the mesh → Clothing tab → select the section → Apply the clothing data, or re-import the original mesh, then Build again. |
