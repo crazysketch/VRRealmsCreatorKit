@@ -1,6 +1,6 @@
 # VR Realms Creator Kit
 
-**v0.4.23 (Alpha)** · Unreal Engine **5.8**
+**v0.4.24 (Alpha)** · Unreal Engine **5.8**
 
 Build maps and avatars for [VR Realms](https://vr-realms.com) and publish them to the Steam Workshop.
 
@@ -95,6 +95,8 @@ If it's not listed here, ask in [Discord](https://discord.com/invite/qMZ7gZzg6A)
 | TOO EXPENSIVE: cloth over 1,500 particles | Simulate a low-poly copy of the garment, or remove the clothing data (the garment stays as normal skinned geometry). |
 | WARNING: cloth that will NOT move in game | The clothing data exists but is not applied to any part of the mesh. Open the mesh → Clothing tab → select the section → Apply the clothing data, or re-import the original mesh, then Build again. |
 | The map is currently open in the editor | You can't build the level that's open. Switch to a different level, then Build again. |
+| **"Level: … taken from the pak being uploaded"** | Nothing to do. Upload reads which level is inside your built pak and tells the game to load that one, so you never have to type or re-pick it. |
+| **UPLOAD STOPPED — the built pak has no level in it** | The pak in your staging folder has no map in it (usually an old or unfinished build). Pick your level, press **Build Map Pak**, then **Upload** again. |
 | BUILD STOPPED: enter an item name first | Item name box is empty. Type a name (letters, numbers, underscore only). |
 | Cook seems frozen for minutes | Normal during shader compilation. Actually stuck = 5+ min with no new log lines. |
 | Build fails: file in use | Close the model's `.fbx` in your 3D tool or the mesh editor before building. |
