@@ -1,12 +1,12 @@
 # VR Realms Creator Kit
 
-**v0.4.24 (Alpha)** · Unreal Engine **5.8**
+**v0.4.25 (Alpha)** · Unreal Engine **5.8**
 
 Build maps and avatars for [VR Realms](https://vr-realms.com) and publish them to the Steam Workshop.
 
 No Visual Studio, no C++, no game source needed. Just Unreal Engine 5.8 and a Steam account that owns VR Realms.
 
-> ⚠️ **Known issue (fix already in the next game update):** do **not** place a **Mirror Widget** item yet. Entering a map that has one crashes the current Steam build. Plain mirrors are fine. Remove the widget marker and rebuild until the update lands.
+> **New in 0.4.25 (needs VR Realms 0.1.7):** a **Mirror** item now places the new real time mirror, and its ghost shows the real 200 × 200 size. The **Mirror Widget** is safe to use again. Build explains exactly where a mesh or map is saved when it cannot move it, instead of failing with "Unexpected". Wall mirrors need one project setting: a fresh kit download has it, and if you updated with the updater, add `r.AllowGlobalClipPlane=True` under `[/Script/Engine.RendererSettings]` in `VRRealms/Config/DefaultEngine.ini` (the first open afterwards recompiles shaders once), then rebuild maps that have a mirror on a wall.
 
 ---
 
@@ -30,6 +30,7 @@ Full details → [Workshop panel guide](https://vr-realms.com/docs/ugc-tools-pan
 - Physics for hair, tails, ears, etc. is added automatically when needed; **Advanced → Remove physics** if you want a still avatar
 - Extra bones (hair, tails, wings…) are supported on UE4-style rigs
 - Heavy cloth is refused: max **1,500 simulation particles** per clothing asset. Simulate a low-poly copy or remove the clothing data
+- Decorations that hang in front of your face without being attached to the head (a card, banner or collar piece on its own bone) are hidden from **your own** first-person view. Everyone else, and your mirror, still see them. Build lists what it hid (needs VR Realms 0.1.7)
 - **Play Avatar** runs the real game with your built avatar on you, before you upload (needs the current VR Realms update)
 - A UE4 / UE5 mannequin avatar with a twisted neck or limbs: **Advanced → Map Community Rig**, then Build again
 
@@ -111,7 +112,7 @@ If it's not listed here, ask in [Discord](https://discord.com/invite/qMZ7gZzg6A)
 | EResult 3 while setting tags | Steam servers unreachable. Make sure Steam is online. The kit retries once on its own. |
 | Build refused: Blueprint uses Execute Console Command / Open Level / Quit Game / … | Those nodes affect the whole game, not just your map. Remove them and Build again. Allowed nodes are on the Scripting API pages. |
 | A node from this kit does nothing in game | Matching game update isn't out yet, or the player is on an older version. Nodes marked *next* on the docs need the matching VR Realms update. |
-| Map has a Mirror Widget and the game crashes on entry | Known issue in the current Steam build, fixed in the next update. Remove the Mirror Widget marker for now. |
+| A mirror on a wall shows grey or the room behind the wall | Add `r.AllowGlobalClipPlane=True` under `[/Script/Engine.RendererSettings]` in `VRRealms/Config/DefaultEngine.ini` (a fresh kit download has it), then rebuild the map. |
 
 ---
 
