@@ -85,6 +85,108 @@ function Copy-Tree($src, $dst) {
     }
 }
 
+# ---------------------------------------------------------------------------
+# NEVER HALF-UPDATED (2026-10-07)
+# ---------------------------------------------------------------------------
+# An install used to write files one after another and stop at the first one Windows refused. On a PC whose
+# security software guards documents and pictures (ransomware protection: it lets an unknown program change
+# .dll and .json files but not .txt or .png, in folders like Desktop and Documents) that meant the plugin
+# files and the version number were already new when a .txt was refused, and the status line still said the
+# tools had been left alone. Two things now stand between a creator and that state:
+#   1. Get-BlockedTargets opens every file the package will replace for writing BEFORE anything is changed.
+#      If one refuses, nothing is touched and the message says what usually causes it.
+#      A file that already has exactly the bytes the package carries is skipped by both steps: it is not
+#      written, so it cannot be refused. The kit's .txt and .png files rarely change between releases, so on
+#      such a PC most updates simply go through.
+#   2. Expand-ZipTracked keeps a copy of each file as it replaces it, and if a write still fails half way
+#      (a full disk, a file opened in between) it puts every one of them back.
+# True when the file on disk already holds exactly what the package would write there.
+function Test-EntrySame($entry, $target) {
+    try {
+        $info = New-Object IO.FileInfo($target)
+        if (-not $info.Exists -or $info.Length -ne $entry.Length) { return $false }
+        $sha = [Security.Cryptography.SHA256]::Create()
+        try {
+            $zs = $entry.Open()
+            try { $a = [BitConverter]::ToString($sha.ComputeHash($zs)) } finally { $zs.Dispose() }
+            $fs = [IO.File]::OpenRead($target)
+            try { $b = [BitConverter]::ToString($sha.ComputeHash($fs)) } finally { $fs.Dispose() }
+        } finally { $sha.Dispose() }
+        return ($a -eq $b)
+    } catch { return $false }
+}
+
+function Get-BlockedTargets($zipPath, $destRoot) {
+    $blocked = New-Object System.Collections.ArrayList
+    $zip = [IO.Compression.ZipFile]::OpenRead($zipPath)
+    try {
+        foreach ($entry in $zip.Entries) {
+            if (-not $entry.Name) { continue }                  # directory marker
+            $target = Join-Path $destRoot $entry.FullName.Replace([char]47, [char]92)
+            if (-not [IO.File]::Exists($target)) { continue }   # a new file: nothing to refuse yet
+            if (Test-EntrySame $entry $target) { continue }     # already identical: it will not be written at all
+            try { $probe = [IO.File]::Open($target, 'Open', 'Write', 'ReadWrite'); $probe.Dispose() }
+            catch { [void]$blocked.Add($entry.FullName.Replace([char]92, [char]47)) }
+        }
+    } finally { $zip.Dispose() }
+    return ,$blocked.ToArray()
+}
+
+function Get-BlockedMessage($blocked, $lead) {
+    $more = ''
+    if ($blocked.Count -gt 1) { $more = " and $($blocked.Count - 1) more" }
+    return "$lead Windows will not let VRR Updater replace '$($blocked[0])'$more. With Unreal Editor closed, this is almost always security software that guards documents and pictures (ransomware protection) refusing .txt and .png files in folders like Desktop and Documents. Allow this folder, or PowerShell, in that software, or move the kit to a plain folder such as C:\VRRealmsCreatorKit, then try again."
+}
+
+function Expand-ZipTracked($zipPath, $destRoot, $undoDir) {
+    $written = New-Object System.Collections.ArrayList
+    $zip = [IO.Compression.ZipFile]::OpenRead($zipPath)
+    try {
+        try {
+            foreach ($entry in $zip.Entries) {
+                if (-not $entry.Name) { continue }
+                $rel    = $entry.FullName.Replace([char]47, [char]92)
+                $target = Join-Path $destRoot $rel
+                if (Test-EntrySame $entry $target) { continue }   # nothing to do, and nothing for anyone to refuse
+                [void][IO.Directory]::CreateDirectory((Split-Path $target -Parent))
+                if ([IO.File]::Exists($target)) {
+                    $undo = Join-Path $undoDir $rel
+                    [void][IO.Directory]::CreateDirectory((Split-Path $undo -Parent))
+                    [IO.File]::Copy($target, $undo, $true)
+                }
+                [void]$written.Add($rel)
+                [IO.Compression.ZipFileExtensions]::ExtractToFile($entry, $target, $true)
+            }
+        } catch {
+            $why      = $_.Exception.Message
+            $failedOn = '?'
+            if ($written.Count -gt 0) { $failedOn = ([string]$written[$written.Count - 1]).Replace([char]92, [char]47) }
+            $notBack = 0
+            foreach ($rel in $written) {
+                $undo   = Join-Path $undoDir $rel
+                $target = Join-Path $destRoot $rel
+                try {
+                    if ([IO.File]::Exists($undo)) { [IO.File]::Copy($undo, $target, $true) }
+                    elseif ([IO.File]::Exists($target)) { [IO.File]::Delete($target) }   # a file this install had added
+                } catch {
+                    # The file that refused in the first place cannot be written now either, and need not be:
+                    # it was never changed. Only a file that really differs from its copy counts as not put back.
+                    $same = $false
+                    try {
+                        if ([IO.File]::Exists($undo) -and [IO.File]::Exists($target)) {
+                            $same = ((Get-FileHash -LiteralPath $undo -Algorithm SHA256).Hash -eq (Get-FileHash -LiteralPath $target -Algorithm SHA256).Hash)
+                        }
+                    } catch { }
+                    if (-not $same) { $notBack++ }
+                }
+            }
+            $tail = 'Every file it had already replaced was put back, so the kit is as it was.'
+            if ($notBack -gt 0) { $tail = "$notBack file(s) could not be put back; your previous tools are in the newest _VRRUpdaterBackup_ folder." }
+            throw "could not write '$failedOn' ($why) $tail"
+        }
+    } finally { $zip.Dispose() }
+}
+
 function Find-KitRoot($startDir) {
     $ancestors = New-Object System.Collections.ArrayList
     $dir = $startDir
@@ -307,7 +409,7 @@ $Headers        = @{ 'User-Agent' = 'VRRUpdater' }
                oversized CornerRadius and draws a lens shape instead of a pill. -->
           <Border Grid.Column="2" VerticalAlignment="Center" CornerRadius="13" Background="{StaticResource Surface}"
                   BorderBrush="{StaticResource Line}" BorderThickness="1" Padding="11,4">
-            <TextBlock Text="build 2026-09-02.2" FontSize="12" FontWeight="Medium" Foreground="{StaticResource Muted}"/>
+            <TextBlock Text="build 2026-10-07.1" FontSize="12" FontWeight="Medium" Foreground="{StaticResource Muted}"/>
           </Border>
         </Grid>
       </Border>
@@ -606,7 +708,7 @@ function Refresh-Releases {
     if (-not $local) {
         $TxtInstalledLabel.Text = "KIT NOT FOUND"
         $TxtInstalled.FontSize  = 14
-        $TxtInstalled.Text = "Put VRRUpdater.cmd anywhere inside your Creator Kit (build 2026-09-02.2)."
+        $TxtInstalled.Text = "Put VRRUpdater.cmd anywhere inside your Creator Kit (build 2026-10-07.1)."
         $TxtPath.Text = $UPluginPath
         Set-Badge ''
         # Show EVERY folder we looked in. "Not found" alone costs a support round trip;
@@ -728,11 +830,18 @@ function Install-Release($entry) {
         # of the run before it. A timestamped name cannot collide, so no delete is needed,
         # and the old backup stays around as extra safety rather than being destroyed.
         # .NET rather than Copy-Item because these paths may contain [square brackets].
+        # Before anything is changed: can every file this package replaces be written? (See NEVER HALF-UPDATED.)
+        $blocked = Get-BlockedTargets $zipPath $KitRoot
+        if ($blocked.Count -gt 0) {
+            Set-Status (Get-BlockedMessage $blocked 'Nothing was changed.') '#FFF87171'
+            return
+        }
+
         $backupDir = Join-Path $KitRoot ("_VRRUpdaterBackup_" + $local + "_" + (Get-Date -Format 'MMdd-HHmmss'))
         Copy-Tree $PluginDir $backupDir
 
         Set-Status "Installing..."
-        Expand-Zip $zipPath $KitRoot
+        Expand-ZipTracked $zipPath $KitRoot (Join-Path $tmpDir 'undo')
 
         $now = Get-LocalVersion
         Set-Status "Installed $now. Your previous tools are in _VRRUpdaterBackup_$local. Reopen your project to use them." '#FF34D399'
@@ -754,7 +863,9 @@ function Install-Release($entry) {
         }
     }
     catch {
-        Set-Status "Install failed: $($_.Exception.Message). Your existing tools were left alone." '#FFF87171'
+        # No blanket "your tools were left alone" here: that sentence was shown after five files had been replaced.
+        # Expand-ZipTracked says in its own message whether everything was put back.
+        Set-Status "Install failed: $($_.Exception.Message)" '#FFF87171'
     }
     finally {
         if (Test-Path -LiteralPath $tmpDir) { Remove-Item -LiteralPath $tmpDir -Recurse -Force -ErrorAction SilentlyContinue }
@@ -896,6 +1007,7 @@ function Invoke-Repair {
         $backupDir = Join-Path $KitRoot ("_VRRUpdaterBackup_" + $local + "_repair_" + (Get-Date -Format 'MMdd-HHmmss'))
         $restored  = 0
         $skipped   = New-Object System.Collections.ArrayList
+        $refused   = New-Object System.Collections.ArrayList   # Windows would not let these be replaced
         $zip = [IO.Compression.ZipFile]::OpenRead($zipPath)
         try {
             foreach ($rel in $script:VerifyBad) {
@@ -912,18 +1024,24 @@ function Invoke-Repair {
                     [void][IO.Directory]::CreateDirectory((Split-Path $bak -Parent))
                     [IO.File]::Copy($target, $bak, $true)
                 }
-                [void][IO.Directory]::CreateDirectory((Split-Path $target -Parent))
-                [IO.Compression.ZipFileExtensions]::ExtractToFile($e, $target, $true)
-                $restored++
+                # One refused file must not stop the rest from being repaired (2026-10-07).
+                try {
+                    [void][IO.Directory]::CreateDirectory((Split-Path $target -Parent))
+                    [IO.Compression.ZipFileExtensions]::ExtractToFile($e, $target, $true)
+                    $restored++
+                } catch { [void]$refused.Add($rel) }
             }
         } finally { $zip.Dispose() }
 
         $msg = "Restored $restored file(s) from release $local."
+        if ($refused.Count -gt 0) { $msg = (Get-BlockedMessage $refused.ToArray() "Restored $restored file(s) from release $local, but") }
         if (Test-Path -LiteralPath $backupDir) { $msg += " Your previous copies are in $(Split-Path $backupDir -Leaf)." }
         if ($skipped.Count -gt 0) { $msg += " Skipped $($skipped.Count) not in the release." }
-        $msg += " Reopen your project to use them."
-        Set-Status $msg '#FF34D399'
-        Invoke-Verify
+        if ($refused.Count -eq 0) { $msg += " Reopen your project to use them." }
+        $doneColor = '#FF34D399'
+        if ($refused.Count -gt 0) { $doneColor = '#FFEAB308' }
+        Set-Status $msg $doneColor
+        if ($refused.Count -eq 0) { Invoke-Verify }   # with refused files the list would only replace this explanation
     }
     catch {
         Set-Status "Repair failed: $($_.Exception.Message). Nothing else was changed." '#FFF87171'

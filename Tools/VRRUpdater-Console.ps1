@@ -87,6 +87,108 @@ function Copy-Tree($src, $dst) {
         [IO.File]::Copy($fl, (Join-Path $dst $fl.Substring($src.Length).TrimStart('\')), $true)
     }
 }
+
+# ---------------------------------------------------------------------------
+# NEVER HALF-UPDATED (2026-10-07)
+# ---------------------------------------------------------------------------
+# An install used to write files one after another and stop at the first one Windows refused. On a PC whose
+# security software guards documents and pictures (ransomware protection: it lets an unknown program change
+# .dll and .json files but not .txt or .png, in folders like Desktop and Documents) that meant the plugin
+# files and the version number were already new when a .txt was refused, and the status line still said the
+# tools had been left alone. Two things now stand between a creator and that state:
+#   1. Get-BlockedTargets opens every file the package will replace for writing BEFORE anything is changed.
+#      If one refuses, nothing is touched and the message says what usually causes it.
+#      A file that already has exactly the bytes the package carries is skipped by both steps: it is not
+#      written, so it cannot be refused. The kit's .txt and .png files rarely change between releases, so on
+#      such a PC most updates simply go through.
+#   2. Expand-ZipTracked keeps a copy of each file as it replaces it, and if a write still fails half way
+#      (a full disk, a file opened in between) it puts every one of them back.
+# True when the file on disk already holds exactly what the package would write there.
+function Test-EntrySame($entry, $target) {
+    try {
+        $info = New-Object IO.FileInfo($target)
+        if (-not $info.Exists -or $info.Length -ne $entry.Length) { return $false }
+        $sha = [Security.Cryptography.SHA256]::Create()
+        try {
+            $zs = $entry.Open()
+            try { $a = [BitConverter]::ToString($sha.ComputeHash($zs)) } finally { $zs.Dispose() }
+            $fs = [IO.File]::OpenRead($target)
+            try { $b = [BitConverter]::ToString($sha.ComputeHash($fs)) } finally { $fs.Dispose() }
+        } finally { $sha.Dispose() }
+        return ($a -eq $b)
+    } catch { return $false }
+}
+
+function Get-BlockedTargets($zipPath, $destRoot) {
+    $blocked = New-Object System.Collections.ArrayList
+    $zip = [IO.Compression.ZipFile]::OpenRead($zipPath)
+    try {
+        foreach ($entry in $zip.Entries) {
+            if (-not $entry.Name) { continue }                  # directory marker
+            $target = Join-Path $destRoot $entry.FullName.Replace([char]47, [char]92)
+            if (-not [IO.File]::Exists($target)) { continue }   # a new file: nothing to refuse yet
+            if (Test-EntrySame $entry $target) { continue }     # already identical: it will not be written at all
+            try { $probe = [IO.File]::Open($target, 'Open', 'Write', 'ReadWrite'); $probe.Dispose() }
+            catch { [void]$blocked.Add($entry.FullName.Replace([char]92, [char]47)) }
+        }
+    } finally { $zip.Dispose() }
+    return ,$blocked.ToArray()
+}
+
+function Get-BlockedMessage($blocked, $lead) {
+    $more = ''
+    if ($blocked.Count -gt 1) { $more = " and $($blocked.Count - 1) more" }
+    return "$lead Windows will not let VRR Updater replace '$($blocked[0])'$more. With Unreal Editor closed, this is almost always security software that guards documents and pictures (ransomware protection) refusing .txt and .png files in folders like Desktop and Documents. Allow this folder, or PowerShell, in that software, or move the kit to a plain folder such as C:\VRRealmsCreatorKit, then try again."
+}
+
+function Expand-ZipTracked($zipPath, $destRoot, $undoDir) {
+    $written = New-Object System.Collections.ArrayList
+    $zip = [IO.Compression.ZipFile]::OpenRead($zipPath)
+    try {
+        try {
+            foreach ($entry in $zip.Entries) {
+                if (-not $entry.Name) { continue }
+                $rel    = $entry.FullName.Replace([char]47, [char]92)
+                $target = Join-Path $destRoot $rel
+                if (Test-EntrySame $entry $target) { continue }   # nothing to do, and nothing for anyone to refuse
+                [void][IO.Directory]::CreateDirectory((Split-Path $target -Parent))
+                if ([IO.File]::Exists($target)) {
+                    $undo = Join-Path $undoDir $rel
+                    [void][IO.Directory]::CreateDirectory((Split-Path $undo -Parent))
+                    [IO.File]::Copy($target, $undo, $true)
+                }
+                [void]$written.Add($rel)
+                [IO.Compression.ZipFileExtensions]::ExtractToFile($entry, $target, $true)
+            }
+        } catch {
+            $why      = $_.Exception.Message
+            $failedOn = '?'
+            if ($written.Count -gt 0) { $failedOn = ([string]$written[$written.Count - 1]).Replace([char]92, [char]47) }
+            $notBack = 0
+            foreach ($rel in $written) {
+                $undo   = Join-Path $undoDir $rel
+                $target = Join-Path $destRoot $rel
+                try {
+                    if ([IO.File]::Exists($undo)) { [IO.File]::Copy($undo, $target, $true) }
+                    elseif ([IO.File]::Exists($target)) { [IO.File]::Delete($target) }   # a file this install had added
+                } catch {
+                    # The file that refused in the first place cannot be written now either, and need not be:
+                    # it was never changed. Only a file that really differs from its copy counts as not put back.
+                    $same = $false
+                    try {
+                        if ([IO.File]::Exists($undo) -and [IO.File]::Exists($target)) {
+                            $same = ((Get-FileHash -LiteralPath $undo -Algorithm SHA256).Hash -eq (Get-FileHash -LiteralPath $target -Algorithm SHA256).Hash)
+                        }
+                    } catch { }
+                    if (-not $same) { $notBack++ }
+                }
+            }
+            $tail = 'Every file it had already replaced was put back, so the kit is as it was.'
+            if ($notBack -gt 0) { $tail = "$notBack file(s) could not be put back; your previous tools are in the newest _VRRUpdaterBackup_ folder." }
+            throw "could not write '$failedOn' ($why) $tail"
+        }
+    } finally { $zip.Dispose() }
+}
 function Find-KitRoot($startDir) {
     $ancestors = New-Object System.Collections.ArrayList
     $dir = $startDir
@@ -149,7 +251,7 @@ function Write-Bad($text)  { Write-Host "  $text" -ForegroundColor Red }
 
 Write-Host ""
 Write-Host "  ================================================" -ForegroundColor DarkCyan
-Write-Host "   VRR UPDATER  -  VR Realms Creator Kit updater   (build 2026-08-08.9)" -ForegroundColor White
+Write-Host "   VRR UPDATER  -  VR Realms Creator Kit updater   (build 2026-10-07.1)" -ForegroundColor White
 Write-Host "  ================================================" -ForegroundColor DarkCyan
 
 # ---------------------------------------------------------------------------
@@ -362,11 +464,19 @@ try {
     # Unique, timestamped backup - see the note in VRRUpdater-App.ps1. Copy-Item -Recurse
     # refuses an existing destination, so a retry after any failure was permanently blocked
     # by the previous attempt's leftovers. .NET copy because paths may contain [brackets].
+    # Before anything is changed: can every file this package replaces be written? (See NEVER HALF-UPDATED.)
+    $blocked = Get-BlockedTargets $zipPath $KitRoot
+    if ($blocked.Count -gt 0) {
+        Write-Host ""
+        Write-Bad (Get-BlockedMessage $blocked 'Nothing was changed.')
+        exit 9
+    }
+
     $backupDir = Join-Path $KitRoot ("_VRRUpdaterBackup_" + $localVersion + "_" + (Get-Date -Format 'MMdd-HHmmss'))
     Copy-Tree $PluginDir $backupDir
     Write-Ok "Backed up your current tools to _VRRUpdaterBackup_$localVersion"
 
-    Expand-Zip $zipPath $KitRoot
+    Expand-ZipTracked $zipPath $KitRoot (Join-Path $tmpDir 'undo')
 
     $newVersion = (Get-Content -LiteralPath $UPluginPath -Raw | ConvertFrom-Json).VersionName
     if ($manifest -and $manifest.contentVersion) {
@@ -384,7 +494,6 @@ try {
 catch {
     Write-Host ""
     Write-Bad "Update failed: $($_.Exception.Message)"
-    Write-Host "  Your existing tools were left alone."
     exit 8
 }
 finally {
