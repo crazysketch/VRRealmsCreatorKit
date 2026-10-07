@@ -1,12 +1,12 @@
 # VR Realms Creator Kit
 
-**v0.4.26 (Alpha)** · Unreal Engine **5.8**
+**v0.4.27 (Alpha)** · Unreal Engine **5.8**
 
 Build maps and avatars for [VR Realms](https://vr-realms.com) and publish them to the Steam Workshop.
 
 No Visual Studio, no C++, no game source needed. Just Unreal Engine 5.8 and a Steam account that owns VR Realms.
 
-> **New in 0.4.26:** picking an avatar mesh now shows a **Face:** line. It names the morph target the game opens when you talk and the one it closes to blink, or says that none was found and how to rename one, so "the sliders work but the mouth is still in game" is answered before you upload. Avatars whose hands have no finger bones, or too few (a mitten hand from an auto-rigger), now Build: the kit finds the two hands by their bone names and tells you the fingers will not curl. The `vrc.v_aa` viseme (Unreal imports it as `vrc_v_aa`) and a bare `AA` are moved as the mouth from the next VR Realms update.
+> **New in 0.4.27:** the Scripting API gains what a remote control car, a boat or a fishing rod needs. **Get Input Axis** reads the sticks, W A S D and the arrow keys. **Get Action Amount** reads how far a trigger is pulled. **Start Controlling** freezes the player's own body while they steer and lets the host read their input directly, and the Menu button always gives it back. **Vibrate Controller** buzzes a hand. Realm Events adds tap, hold and double tap, and four spare actions (`Action1` to `Action4`) are yours to use. **A map that uses these nodes needs the next VR Realms update to run:** build with them now, publish once that update is out. Every node and a key binding table → [Nodes](https://vr-realms.com/docs/api-nodes.html#input).
 
 ---
 
@@ -48,6 +48,11 @@ Full details + troubleshooting → [Build an Avatar](https://vr-realms.com/docs/
 
 Interactables (screens, jukeboxes, mirrors, game devices, etc.) are dropped in with `BP_VRItemMarker`.
 Want game logic? See the [Scripting API](https://vr-realms.com/docs/api.html) for the allowed nodes.
+
+**Sticks, buttons and things you drive (from the next VR Realms update):** read a player's sticks and triggers with
+**Get Input Axis** and **Get Action Amount**, take over their controls with **Start Controlling**, and buzz a hand with
+**Vibrate Controller**. You name an action, never a key, so it works on a headset, a keyboard and a gamepad, and follows
+the player's own bindings. Walkthrough → [A remote control car or a boat](https://vr-realms.com/docs/api-scenarios.html#remote-control).
 
 **Sounds and the players' volume sliders:** select an Ambient Sound → Details → **VR Realms → Volume slider** and pick
 Music, SFX, Ambience, Dialog or TV / Media. Left "Not connected", only the Master slider turns it down. Sounds played
