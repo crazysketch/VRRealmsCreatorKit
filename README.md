@@ -1,12 +1,12 @@
 # VR Realms Creator Kit
 
-**v0.4.27 (Alpha)** · Unreal Engine **5.8**
+**v0.4.28 (Alpha)** · Unreal Engine **5.8**
 
 Build maps and avatars for [VR Realms](https://vr-realms.com) and publish them to the Steam Workshop.
 
 No Visual Studio, no C++, no game source needed. Just Unreal Engine 5.8 and a Steam account that owns VR Realms.
 
-> **New in 0.4.27:** the Scripting API gains what a remote control car, a boat or a fishing rod needs. **Get Input Axis** reads the sticks, W A S D and the arrow keys. **Get Action Amount** reads how far a trigger is pulled. **Start Controlling** freezes the player's own body while they steer and lets the host read their input directly, and the Menu button always gives it back. **Vibrate Controller** buzzes a hand. Realm Events adds tap, hold and double tap, and four spare actions (`Action1` to `Action4`) are yours to use. **A map that uses these nodes needs the next VR Realms update to run:** build with them now, publish once that update is out. Every node and a key binding table → [Nodes](https://vr-realms.com/docs/api-nodes.html#input).
+> **New in 0.4.28:** **Build Map Pak** now brings in what the game does not carry. A material that uses one of Unreal's own engine textures (the `water_n` ripple texture most water tutorials pick, for example) gets that texture copied into your map's folder, so water that moves in the editor also moves in game. Materials on FBX props are repaired the same way, so an FBX map no longer turns grey in game. The build log lists every file it brought in as `copied`. Also new: a short checklist after every upload (make the item Public, tags, audience), and Build no longer stops with "Cook failed" when Unreal's Game Features plugin is switched on in your project.
 
 ---
 
@@ -117,6 +117,9 @@ If it's not listed here, ask in [Discord](https://discord.com/invite/qMZ7gZzg6A)
 | Morph target sliders work in the mesh editor, but the mouth or eyes don't move in game | The game only moves a shape whose **name** it recognises. Pick the mesh in the Workshop panel and read the **Face:** line: it names the shapes the game will use, or says none was found. To fix it, open the mesh, right-click the open-mouth shape in the Morph Targets list → **Rename** → `MouthOpen` (and `Blink` for closed eyes), save, then Build and upload again. |
 | Avatar shows as the default body (Quinn) | Game rejected the mesh. Usually means it skipped the kit's checks. Validate in the kit, then Build + Upload again. |
 | Avatar or face is plain grey | Older kits packed materials wrong. Update the kit, Build again, re-upload. |
+| Water ripples (or another moving material) work in the editor but are still in game | The material uses one of Unreal's engine textures, and the game only carries the few it uses itself. Update the kit to 0.4.28 or later and press **Build Map Pak** again: Build copies the texture into your map's folder (look for `copied` in the build log). Then upload again. |
+| FBX props in a map are plain grey in game | Kits before 0.4.28 did not pack the material every FBX import depends on. Update the kit, Build again, re-upload. |
+| A lake or ocean made with Unreal's Water plugin shows a grey grid in game | The Water plugin's materials are not in the game. Use a plane with your own water material instead. |
 | Black in the right eye / grey checkerboard materials | Renderer settings drifted from the kit. VRR Updater → Verify files → Repair, then rebuild. |
 | Steam refused the tag update: access denied | The Steam app is signed into a different account than the one that uploaded. Sign the Steam app in as the uploader, then Set Tags again. |
 | EResult 3 while setting tags | Steam servers unreachable. Make sure Steam is online. The kit retries once on its own. |
