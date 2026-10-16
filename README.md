@@ -1,12 +1,12 @@
 # VR Realms Creator Kit
 
-**v0.4.30 (Alpha)** · Unreal Engine **5.8**
+**v0.4.31 (Alpha)** · Unreal Engine **5.8**
 
 Build maps and avatars for [VR Realms](https://vr-realms.com) and publish them to the Steam Workshop.
 
 No Visual Studio, no C++, no game source needed. Just Unreal Engine 5.8 and a Steam account that owns VR Realms.
 
-> **New in 0.4.30:** **MetaHuman to avatar.** Pick the Blueprint of an assembled MetaHuman, press **Make modular avatar**, and you get an avatar whose face talks, blinks and follows face tracking, with outfit, hair and cape as pieces. In game it is right from the next VR Realms update. **The upload form now belongs to the item you picked:** title, description, preview and Workshop ID are saved with each avatar and each map, and **New avatar** and **New map** start with an empty form. Older kits kept the last item's Workshop ID in the form, so uploading a second avatar could replace the first one's Workshop item.
+> **New in 0.4.31:** **Gun match items:** the **SMG Pad**, a **Health Pickup** and a **Shield Pickup**, and the Match role **Match area (arena box)** for a map where the match is only one part (all need VR Realms 0.3.3). **The Item list is sorted by kind:** Media, Drawing, Interactables, Vehicles, Weapons and Match. **Build Map Pak gives three new tips** that never stop a build: a map with no Nav Mesh Bounds Volume, a GameMode Override that would leave players as a flying camera, and landscape grass that would show black in a baked map.
 
 ---
 
@@ -32,10 +32,10 @@ Full details → [Workshop panel guide](https://vr-realms.com/docs/ugc-tools-pan
 - Hands with no finger bones, or too few (a mitten hand from an auto-rigger), still Build: the kit finds the two hands by their bone names. The avatar works and can grab, but its fingers will not curl, and Build says so
 - Heavy cloth is refused: max **1,500 simulation particles** per clothing asset. Simulate a low-poly copy or remove the clothing data
 - Decorations that hang in front of your face without being attached to the head (a card, banner or collar piece on its own bone) are hidden from **your own** first-person view. Everyone else, and your mirror, still see them. Build lists what it hid (needs VR Realms 0.1.7)
-- **Face shapes:** picking a mesh now shows a **Face:** line that names the morph target the game opens when you talk and the one it closes to blink, or says that none was found. The game goes by the shape's **name**: `MouthOpen`, `JawOpen`, `vrc.v_aa` (Unreal imports it as `vrc_v_aa`), `viseme_aa`, `AA` or VRoid's `Fcl_MTH_A` for the mouth, and any name with `Blink` in it for the eyes. It moves one mouth shape; other visemes are not used (`vrc.v_aa` and `AA` work from the next VR Realms update)
+- **Face shapes:** picking a mesh now shows a **Face:** line that names the morph target the game opens when you talk and the one it closes to blink, or says that none was found. The game goes by the shape's **name**: `MouthOpen`, `JawOpen`, `vrc.v_aa` (Unreal imports it as `vrc_v_aa`), `viseme_aa`, `AA` or VRoid's `Fcl_MTH_A` for the mouth, and any name with `Blink` in it for the eyes. It moves one mouth shape; other visemes are not used (`vrc.v_aa` and `AA` need VR Realms 0.2.4 or later)
 - **Looks** (optional): several texture sets in one avatar. Open **Optional: Looks** on the avatar page, add a look, and pick a material or textures for each part of the body. A look is a folder beside the avatar's mesh, `Looks/<Name>/`, and Build packs every look with the avatar. Players choose a look in game (needs VR Realms 0.3.0). Guide → [Looks](https://vr-realms.com/docs/avatars-looks.html)
 - **Parts and outfits** (optional): pieces a player can change. Open **Optional: Parts**. A piece is a skeletal mesh (hair, a torso, legs, shoes), a slot wears one piece or none, and sets of pieces are saved as named outfits. A piece that is not skinned to the body (wings, a tail, a hat) is placed on one bone with the handles in the 3D view. In a modular pack the head is usually the only mesh with the whole skeleton: pick the head as the avatar's mesh and add everything else as pieces. Players change pieces and outfits in game (needs VR Realms 0.3.0). Guide → [Parts and outfits](https://vr-realms.com/docs/avatars-parts.html)
-- **MetaHuman** (optional): open **Optional: MetaHuman → Avatar**, pick the Blueprint of an assembled MetaHuman and press **Make modular avatar**. The body leads, the face is worn as a piece with 51 named shapes (talking, blinking, gaze, face tracking), and outfit, hair and a cape become pieces in the Parts box. Every material is drawn into plain textures the game can show. **Start MetaHuman mode** restarts the kit for one session in Shader Model 6 with Epic's MetaHuman tool switched on: make the MetaHuman and press the button there (it needs a DirectX 12 graphics card). Assemble as **UE Optimized**, which gives the hair its cards. The face moves and the sleeves are right in game from the next VR Realms update. Guide → [MetaHuman](https://vr-realms.com/docs/avatars-metahuman.html)
+- **MetaHuman** (optional): open **Optional: MetaHuman → Avatar**, pick the Blueprint of an assembled MetaHuman and press **Make modular avatar**. The body leads, the face is worn as a piece with 51 named shapes (talking, blinking, gaze, face tracking), and outfit, hair and a cape become pieces in the Parts box. Every material is drawn into plain textures the game can show. **Start MetaHuman mode** restarts the kit for one session in Shader Model 6 with Epic's MetaHuman tool switched on: make the MetaHuman and press the button there (it needs a DirectX 12 graphics card). Assemble as **UE Optimized**, which gives the hair its cards. The face moves and the sleeves are right in game from VR Realms 0.3.2. Guide → [MetaHuman](https://vr-realms.com/docs/avatars-metahuman.html)
 - **Textures are built at 2048 px at most.** Build Avatar Pak builds every bigger texture in the avatar's folder at 2048 px and the log says how many. Your imported image is kept. Avatars only, map textures are not touched
 - **Play Avatar** runs the real game with your built avatar on you, before you upload (needs the current VR Realms update)
 - A UE4 / UE5 mannequin avatar with a twisted neck or limbs: **Advanced → Map Community Rig**, then Build again
@@ -77,6 +77,12 @@ the item with a copy of it in its hand. Move the copy until it sits right: the g
 right, left or either, **Hold animation** is optional, **Clip time** shows any moment of it, **Start again** forgets the
 grip. In game since VR Realms 0.3.0, desktop players first: E puts the item in the hand the way you placed it.
 VR players grab as before. A Hold animation and the skeleton it was made on must be inside your map's folder.
+
+**Gun matches (the new parts need VR Realms 0.3.3):** set an item marker's **Item** to **Rifle Pad**, **Pistol Pad** or **SMG Pad** (Weapons) for guns, and to **Health Pickup** or **Shield Pickup** (Match) for a heart (50 health, back after 20 seconds) or a shield (50
+shield points, back after 30 seconds) that sits on the floor under the marker. Taking a gun from a pad costs a little gold in game. A map
+that is also a place to hang out: draw a Trigger Box around the match and set its **Match role** to **Match area (arena box)**. Inside it the
+guns work, a gun carried out of it dissolves and shots stop at its walls. A map that is all match needs none.
+Walkthrough → [Deathmatch](https://vr-realms.com/docs/modes-deathmatch.html)
 
 Full details + troubleshooting → [Build a Map](https://vr-realms.com/docs/maps-build.html) · [Interactables](https://vr-realms.com/docs/interactables.html)
 
@@ -134,11 +140,14 @@ If it's not listed here, ask in [Discord](https://discord.com/invite/qMZ7gZzg6A)
 | A map with a Realm Events component fails to load, or the game closes while it loads | The map was built with kit 0.4.27 or 0.4.28. Update the kit, press **Build Map Pak** again, upload again. |
 | A Blueprint shows an error on On Player Action Tap, Hold or Double Tap after updating the kit | Those events moved to the **Realm Input Events** component. Add it beside Realm Events and bind the events there. |
 | An avatar with parts shows only a head in game | Parts need VR Realms 0.3.0 or later. Update the game. |
-| A MetaHuman avatar's face does not move in game, or a sleeve shows spikes at the wrist | Both are right from the next VR Realms update. The current game wears the pieces but does not move the face piece yet. |
+| A MetaHuman avatar's face does not move in game, or a sleeve shows spikes at the wrist | Both are right from VR Realms 0.3.2. Update the game. |
 | The head in Epic's MetaHuman tool is grey | The kit draws like the game (Shader Model 5) and that tool needs Shader Model 6. On the avatar page open **Optional: MetaHuman → Avatar** and press **Start MetaHuman mode**. |
 | Epic's MetaHuman tool seems stuck at its rig step | The first time, it opens an Epic sign in page in your browser and waits for it. Finish the sign in there. |
 | A MetaHuman avatar has no hair | The game cannot draw hair strands. Assemble the MetaHuman as **UE Optimized** so the hair has cards, then press **Make modular avatar** again. |
 | One of my Workshop items turned into another avatar after an upload | Kits before 0.4.30 kept the last item's Workshop ID in the form. Update the kit, pick the right avatar, check the Workshop ID box and upload it again. |
+| Build says there is no Nav Mesh Bounds Volume | Advice only, the build goes on. VR players who move by Teleport, Point to Walk or Out of Body land only on a nav mesh, and the game's own fallback can also land them on roofs and props. **Place Actors → Volumes → Nav Mesh Bounds Volume**, scale it over every floor players walk on, press **P** to see it, then Build again. |
+| Players are a flying camera in your map, or Build warns about the GameMode Override | **Window → World Settings** and set **GameMode Override** to None. VR Realms brings its own game mode; the game modes of a map are its VRGame tags. |
+| Grass or small stones on a landscape show black in game | Open each landscape grass type and tick **Use Landscape Lightmap**, build lighting, then Build Map Pak again. Build lists the grass types that need it. |
 | Build stopped: "Still non-conforming after the fix-up" on a skeleton with a virtual bone | Fixed in kit 0.4.29. Update the kit and Build again. |
 | UE4 / UE5 mannequin avatar has a twisted or broken neck, arms or legs in game | The rig uses mannequin bone names but its bones are rotated differently. Press **Advanced → Map Community Rig**, then Build again. |
 | Morph target sliders work in the mesh editor, but the mouth or eyes don't move in game | The game only moves a shape whose **name** it recognises. Pick the mesh in the Workshop panel and read the **Face:** line: it names the shapes the game will use, or says none was found. To fix it, open the mesh, right-click the open-mouth shape in the Morph Targets list → **Rename** → `MouthOpen` (and `Blink` for closed eyes), save, then Build and upload again. |
