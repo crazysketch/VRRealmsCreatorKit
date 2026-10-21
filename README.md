@@ -1,12 +1,12 @@
 # VR Realms Creator Kit
 
-**v0.4.31 (Alpha)** · Unreal Engine **5.8**
+**v0.4.32 (Alpha)** · Unreal Engine **5.8**
 
 Build maps and avatars for [VR Realms](https://vr-realms.com) and publish them to the Steam Workshop.
 
 No Visual Studio, no C++, no game source needed. Just Unreal Engine 5.8 and a Steam account that owns VR Realms.
 
-> **New in 0.4.31:** **Gun match items:** the **SMG Pad**, a **Health Pickup** and a **Shield Pickup**, and the Match role **Match area (arena box)** for a map where the match is only one part (all need VR Realms 0.3.3). **The Item list is sorted by kind:** Media, Drawing, Interactables, Vehicles, Weapons and Match. **Build Map Pak gives three new tips** that never stop a build: a map with no Nav Mesh Bounds Volume, a GameMode Override that would leave players as a flying camera, and landscape grass that would show black in a baked map.
+> **New in 0.4.32:** **Import avatar file:** bring an avatar in from a **.unitypackage**, a **.zip / .rar / .7z** download, an **.fbx**, a **.vrm** or a **.glb**, with the materials, pictures and parts its own files give it, into its own item folder, ready to Build. **Import MetaHuman package (.mhpkg)** in the MetaHuman box. **Map Community Rig** reads more rigs: 3ds Max biped and Rigify skeletons, mirrored arms and hands with a palm bone. **Upload says when Steam sent nothing**: with no saved Steam login it stops and says so, instead of UPLOAD COMPLETE.
 
 ---
 
@@ -25,6 +25,7 @@ Full details → [Workshop panel guide](https://vr-realms.com/docs/ugc-tools-pan
 
 ## Avatars
 
+- **Import avatar file** (Avatar page, under Skeletal mesh): pick a **.unitypackage**, a **.zip / .rar / .7z** download, an **.fbx**, a **.vrm** or a **.glb**. The kit unpacks it, finds the avatar in it and brings it in with the game's own converter: each part gets the material its avatar's own prefab gives it, its pictures come along, and parts the avatar keeps off stay off. It lands in its own item folder and is picked for you. Then **Build Avatar Pak** and **Play Avatar**. Guide → [Import an avatar file](https://vr-realms.com/docs/avatars-import.html)
 - Standard UE4 / UE5 mannequin skeletons work out of the box
 - Other humanoid rigs → **Build** works the bones out from the shape (no separate Prepare step)
 - Physics for hair, tails, ears, etc. is added automatically when needed; **Advanced → Remove physics** if you want a still avatar
@@ -35,7 +36,7 @@ Full details → [Workshop panel guide](https://vr-realms.com/docs/ugc-tools-pan
 - **Face shapes:** picking a mesh now shows a **Face:** line that names the morph target the game opens when you talk and the one it closes to blink, or says that none was found. The game goes by the shape's **name**: `MouthOpen`, `JawOpen`, `vrc.v_aa` (Unreal imports it as `vrc_v_aa`), `viseme_aa`, `AA` or VRoid's `Fcl_MTH_A` for the mouth, and any name with `Blink` in it for the eyes. It moves one mouth shape; other visemes are not used (`vrc.v_aa` and `AA` need VR Realms 0.2.4 or later)
 - **Looks** (optional): several texture sets in one avatar. Open **Optional: Looks** on the avatar page, add a look, and pick a material or textures for each part of the body. A look is a folder beside the avatar's mesh, `Looks/<Name>/`, and Build packs every look with the avatar. Players choose a look in game (needs VR Realms 0.3.0). Guide → [Looks](https://vr-realms.com/docs/avatars-looks.html)
 - **Parts and outfits** (optional): pieces a player can change. Open **Optional: Parts**. A piece is a skeletal mesh (hair, a torso, legs, shoes), a slot wears one piece or none, and sets of pieces are saved as named outfits. A piece that is not skinned to the body (wings, a tail, a hat) is placed on one bone with the handles in the 3D view. In a modular pack the head is usually the only mesh with the whole skeleton: pick the head as the avatar's mesh and add everything else as pieces. Players change pieces and outfits in game (needs VR Realms 0.3.0). Guide → [Parts and outfits](https://vr-realms.com/docs/avatars-parts.html)
-- **MetaHuman** (optional): open **Optional: MetaHuman → Avatar**, pick the Blueprint of an assembled MetaHuman and press **Make modular avatar**. The body leads, the face is worn as a piece with 51 named shapes (talking, blinking, gaze, face tracking), and outfit, hair and a cape become pieces in the Parts box. Every material is drawn into plain textures the game can show. **Start MetaHuman mode** restarts the kit for one session in Shader Model 6 with Epic's MetaHuman tool switched on: make the MetaHuman and press the button there (it needs a DirectX 12 graphics card). Assemble as **UE Optimized**, which gives the hair its cards. The face moves and the sleeves are right in game from VR Realms 0.3.2. Guide → [MetaHuman](https://vr-realms.com/docs/avatars-metahuman.html)
+- **MetaHuman** (optional): open **Optional: MetaHuman → Avatar**, pick the Blueprint of an assembled MetaHuman and press **Make modular avatar**. The body leads, the face is worn as a piece with 51 named shapes (talking, blinking, gaze, face tracking), and outfit, hair and a cape become pieces in the Parts box. Every material is drawn into plain textures the game can show. **Start MetaHuman mode** restarts the kit for one session in Shader Model 6 with Epic's MetaHuman tool switched on: make the MetaHuman and press the button there (it needs a DirectX 12 graphics card). Assemble as **UE Optimized**, which gives the hair its cards. The face moves and the sleeves are right in game from VR Realms 0.3.2. A **.mhpkg** from Epic's MetaHuman tool (a character, or an outfit for one) comes in with **Import MetaHuman package (.mhpkg)...** in MetaHuman mode. Guide → [MetaHuman](https://vr-realms.com/docs/avatars-metahuman.html)
 - **Textures are built at 2048 px at most.** Build Avatar Pak builds every bigger texture in the avatar's folder at 2048 px and the log says how many. Your imported image is kept. Avatars only, map textures are not touched
 - **Play Avatar** runs the real game with your built avatar on you, before you upload (needs the current VR Realms update)
 - A UE4 / UE5 mannequin avatar with a twisted neck or limbs: **Advanced → Map Community Rig**, then Build again
@@ -150,6 +151,9 @@ If it's not listed here, ask in [Discord](https://discord.com/invite/qMZ7gZzg6A)
 | Grass or small stones on a landscape show black in game | Open each landscape grass type and tick **Use Landscape Lightmap**, build lighting, then Build Map Pak again. Build lists the grass types that need it. |
 | Build stopped: "Still non-conforming after the fix-up" on a skeleton with a virtual bone | Fixed in kit 0.4.29. Update the kit and Build again. |
 | UE4 / UE5 mannequin avatar has a twisted or broken neck, arms or legs in game | The rig uses mannequin bone names but its bones are rotated differently. Press **Advanced → Map Community Rig**, then Build again. |
+| Upload stops with "Steam did not upload anything" | SteamCMD has no saved login for the Steam user in the panel. Put your own Steam login name in the Steam user box (not a placeholder), click **Steam Login (one time)** if it is new on this PC, then Upload again. Kits before 0.4.32 said UPLOAD COMPLETE here although nothing went up. |
+| Import avatar file says the avatar stands many metres tall | That is the size its file gives it. If it is meant to be person sized, scale the mesh in Unreal before Build. |
+| Import avatar file left a piece out | A modular avatar's pieces that replace the ones worn at first (another hairstyle, another jacket) stay out of the one mesh, as the game shows it at first. The log names them. To keep every piece, type `vrr.Kit.ImportAvatarAllPieces 1` in the console and import again. |
 | Morph target sliders work in the mesh editor, but the mouth or eyes don't move in game | The game only moves a shape whose **name** it recognises. Pick the mesh in the Workshop panel and read the **Face:** line: it names the shapes the game will use, or says none was found. To fix it, open the mesh, right-click the open-mouth shape in the Morph Targets list → **Rename** → `MouthOpen` (and `Blink` for closed eyes), save, then Build and upload again. |
 | Avatar shows as the default body (Quinn) | Game rejected the mesh. Usually means it skipped the kit's checks. Validate in the kit, then Build + Upload again. |
 | Avatar or face is plain grey | Older kits packed materials wrong. Update the kit, Build again, re-upload. |
@@ -179,6 +183,8 @@ This kit uses **[KawaiiPhysics](https://github.com/pafuhana1213/KawaiiPhysics)**
 
 **All rights to KawaiiPhysics remain with its author under the [MIT License](https://github.com/pafuhana1213/KawaiiPhysics/blob/master/LICENSE).**
 We only use it; we do not claim ownership of it.
+
+**Import avatar file** reads FBX files with **[ufbx](https://github.com/ufbx/ufbx)** by Samuli Raivio, under the MIT License. Its notice is in `VRRealms/Plugins/VRRealmsCreatorKit/THIRD-PARTY-NOTICES.txt`.
 
 The kit itself is © 2026 Sketchy Realms. See [LICENSE.md](LICENSE.md): use it to make VR Realms content, keep what you make, don't redistribute the kit.
 
