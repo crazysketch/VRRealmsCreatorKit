@@ -1,16 +1,18 @@
 # VR Realms Creator Kit
 
-**v0.4.32 (Alpha)** · Unreal Engine **5.8**
+**v0.5.1 (Alpha)** · Unreal Engine **5.8**
 
 Build maps and avatars for [VR Realms](https://vr-realms.com) and publish them to the Steam Workshop.
 
 No Visual Studio, no C++, no game source needed. Just Unreal Engine 5.8 and a Steam account that owns VR Realms.
 
-> **New in 0.4.32:** **Import avatar file:** bring an avatar in from a **.unitypackage**, a **.zip / .rar / .7z** download, an **.fbx**, a **.vrm** or a **.glb**, with the materials, pictures and parts its own files give it, into its own item folder, ready to Build. **Import MetaHuman package (.mhpkg)** in the MetaHuman box. **Map Community Rig** reads more rigs: 3ds Max biped and Rigify skeletons, mirrored arms and hands with a palm bone. **Upload says when Steam sent nothing**: with no saved Steam login it stops and says so, instead of UPLOAD COMPLETE.
+> **New in 0.5.1:** **The VR Realms Creator Kit app:** a Windows app with one list of what you need (the Epic Games Launcher, Unreal Engine 5.8, the kit, Steam and SteamCMD) and a button for each step. It installs the kit, updates it without touching your Community folder or files you changed, verifies and repairs it, and opens it in Unreal Engine 5.8. [Get the app](https://github.com/crazysketch/VRRealmsCreatorKitApp/releases/latest) · [what it does](https://vr-realms.com/docs/ugc-tools.html#app). **Import avatar file** keeps its picture copies small: PNG or JPEG at 2048 px at most, where a pack's 4K pictures used to be copied as they were.
 
 ---
 
 ## Quick Start
+
+**Easiest:** the [Creator Kit app](https://github.com/crazysketch/VRRealmsCreatorKitApp/releases/latest) does steps 1 to 3 for you and keeps the kit up to date.
 
 1. Install **Unreal Engine 5.8** (Epic Games Launcher)
 2. Unzip the kit somewhere with a short path
