@@ -1,12 +1,12 @@
 # VR Realms Creator Kit
 
-**v0.5.1 (Alpha)** · Unreal Engine **5.8**
+**v0.5.2 (Alpha)** · Unreal Engine **5.8**
 
 Build maps and avatars for [VR Realms](https://vr-realms.com) and publish them to the Steam Workshop.
 
 No Visual Studio, no C++, no game source needed. Just Unreal Engine 5.8 and a Steam account that owns VR Realms.
 
-> **New in 0.5.1:** **The VR Realms Creator Kit app:** a Windows app with one list of what you need (the Epic Games Launcher, Unreal Engine 5.8, the kit, Steam and SteamCMD) and a button for each step. It installs the kit, updates it without touching your Community folder or files you changed, verifies and repairs it, and opens it in Unreal Engine 5.8. [Get the app](https://github.com/crazysketch/VRRealmsCreatorKitApp/releases/latest) · [what it does](https://vr-realms.com/docs/ugc-tools.html#app). **Import avatar file** keeps its picture copies small: PNG or JPEG at 2048 px at most, where a pack's 4K pictures used to be copied as they were.
+> **New in 0.5.2:** **Upload makes the item Public.** Every Upload, a new item or an update, sets it Public on the Steam Workshop, so there is nothing to switch on its Workshop page. Players see it in VR Realms once it has been reviewed, as before.
 
 ---
 
