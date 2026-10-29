@@ -1,12 +1,12 @@
 # VR Realms Creator Kit
 
-**v0.5.2 (Alpha)** · Unreal Engine **5.8**
+**v0.5.3 (Alpha)** · Unreal Engine **5.8**
 
 Build maps and avatars for [VR Realms](https://vr-realms.com) and publish them to the Steam Workshop.
 
 No Visual Studio, no C++, no game source needed. Just Unreal Engine 5.8 and a Steam account that owns VR Realms.
 
-> **New in 0.5.2:** **Upload makes the item Public.** Every Upload, a new item or an update, sets it Public on the Steam Workshop, so there is nothing to switch on its Workshop page. Players see it in VR Realms once it has been reviewed, as before.
+> **New in 0.5.3:** **Open World maps work.** A map made from the Open World template (World Partition) used to show up empty in VR Realms. Build Map Pak now makes a normal copy of it, named after your map with _VRR at the end, with every actor and the landscape, and ships that. Keep editing your own map: every Build makes the copy again.
 
 ---
 
