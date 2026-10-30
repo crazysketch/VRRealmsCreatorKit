@@ -1,12 +1,14 @@
 # VR Realms Creator Kit
 
-**v0.5.3.2 (Alpha)** · Unreal Engine **5.8**
+**v0.5.4 (Alpha)** · Unreal Engine **5.8**
 
 Build maps and avatars for [VR Realms](https://vr-realms.com) and publish them to the Steam Workshop.
 
 No Visual Studio, no C++, no game source needed. Just Unreal Engine 5.8 and a Steam account that owns VR Realms.
 
-> **New in 0.5.3.2:** **Water.** The kit turns on Unreal's Water plugin, so Place Actors lists the Water Bodies (Lake, River, Ocean) with no plugin to find. Build ships a map with water as it is: VR Realms draws the Water plugin's own materials from its game update of October 29, 2026 (an older game shows the water as a grey grid). In VR a lake costs far less than an ocean.
+> **New in 0.5.4:** **Your own dares.** The Workshop panel has a Dares box under Change note: give up to 3 dares a title and a hint, and the kit makes each one's id. Press Copy tag and put that tag on any actor: a player who walks into it finishes the dare. Or call the new node Complete Dare (Local) with the id. Upload sends them; after review players find them on the Creator dares tab of the Dares page. They pay players gold, and you earn a little each time someone new finishes one. Also new in the Item list under Weapons: AS-97 Pad (a heavy pistol) and Grenade Pad.
+>
+> **0.5.3.2:** **Water.** The kit turns on Unreal's Water plugin, so Place Actors lists the Water Bodies (Lake, River, Ocean) with no plugin to find. Build ships a map with water as it is: VR Realms draws the Water plugin's own materials from its game update of October 29, 2026 (an older game shows the water as a grey grid). In VR a lake costs far less than an ocean.
 >
 > **0.5.3:** **Open World maps work.** A map made from the Open World template (World Partition) used to show up empty in VR Realms. Build Map Pak now makes a normal copy of it, named after your map with _VRR at the end, with every actor and the landscape, and ships that. Keep editing your own map: every Build makes the copy again.
 

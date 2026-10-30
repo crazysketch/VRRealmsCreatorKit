@@ -1,6 +1,6 @@
 {
 	"generated": "2026-09-18T19:52:08.204Z",
-	"count": 17,
+	"count": 19,
 	"items": [
 		{
 			"id": "TV",
@@ -284,6 +284,44 @@
 			"sizeTrusted": true,
 			"sizeSource": "mesh",
 			"facingX": 0,
+			"facingY": 1,
+			"facingZ": 0
+		},
+		{
+			"id": "HeavyPistol",
+			"tag": "VRItem.HeavyPistol",
+			"displayName": "AS-97 Pad",
+			"category": "Weapons",
+			"description": "The same thing with the AS-97, a heavy pistol: it hits harder than the pistol but fires slower. The mesh you tag is hidden in-game (collision stays) — add VRShow if it is a rack players should see.",
+			"keepsYourMesh": true,
+			"hasAudio": false,
+			"resolves": true,
+			"sizeX": 4.9515672503603074,
+			"sizeY": 33.825057506561279,
+			"sizeZ": 17.939860850572586,
+			"pivotZ": 9.130970224738121,
+			"sizeTrusted": false,
+			"sizeSource": "mesh",
+			"facingX": -2.2204460492503126e-16,
+			"facingY": 1,
+			"facingZ": 0
+		},
+		{
+			"id": "Grenade",
+			"tag": "VRItem.Grenade",
+			"displayName": "Grenade Pad",
+			"category": "Weapons",
+			"description": "A G-18 grenade on the pad, a new one 30 seconds after it is taken. Throw it (let go in VR, click on desktop): it goes off when it hits something and hurts everyone within 5 metres. The mesh you tag is hidden in-game (collision stays) — add VRShow if it is a rack players should see.",
+			"keepsYourMesh": true,
+			"hasAudio": false,
+			"resolves": true,
+			"sizeX": 6.2,
+			"sizeY": 8.4,
+			"sizeZ": 15.8,
+			"pivotZ": 0,
+			"sizeTrusted": true,
+			"sizeSource": "mesh",
+			"facingX": -2.2204460492503126e-16,
 			"facingY": 1,
 			"facingZ": 0
 		},
