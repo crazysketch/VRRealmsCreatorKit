@@ -216,7 +216,7 @@
 			"tag": "VRItem.Car",
 			"displayName": "Drivable Car",
 			"category": "Vehicles",
-			"description": "A car players can actually drive — climb in, grab the wheel, pull the throttle. Place it where it should start; everyone in the room sees whoever is driving.",
+			"description": "A sedan players can drive, with seats for four and a passenger's view of the road. Place it where it should start; everyone in the room sees whoever is driving. Your own car: drop a rigged car mesh in the level and tick Drivable car on it.",
 			"keepsYourMesh": false,
 			"hasAudio": false,
 			"resolves": true,
