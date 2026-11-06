@@ -1,12 +1,14 @@
 # VR Realms Creator Kit
 
-**v0.5.4.2 (Alpha)** · Unreal Engine **5.8**
+**v0.5.4.3 (Alpha)** · Unreal Engine **5.8**
 
 Build maps and avatars for [VR Realms](https://vr-realms.com) and publish them to the Steam Workshop.
 
 No Visual Studio, no C++, no game source needed. Just Unreal Engine 5.8 and a Steam account that owns VR Realms.
 
-> **New in 0.5.4.2:** **Drivable cars.** Drop a rigged car mesh into your map as a Skeletal Mesh Actor, tick Drivable car under Details > VR Realms, and players can sit in it and drive it. No Blueprint, no wheel assets, no Anim Blueprint: wheels are found by bone name (wheel, tire or tyre), the front of the mesh faces +X. The same box sets top speed, acceleration, brakes, steering, grip, suspension, weight, the driven wheels and the engine sound, and says whether the mesh is ready to drive. The Drivable Car item in the Item list is a ready-made sedan. Cars need the next VR Realms update: they work today on the alpha branch, and not yet for players on the default branch. Guide: https://vr-realms.com/docs/maps-cars.html
+> **New in 0.5.4.3:** **Upload goes through the Steam app, tags included:** the files, title, description, preview AND tags go up in one step, and Steam is no longer signed out by the upload (no SteamCMD login needed; the old way stays as a setting). Upload asks for a MAP TYPE / AVATAR STYLE and an AUDIENCE tag and shows the tags before it sends. **Maps may be up to 1100 MB** (avatars stay 700 MB, 800 with parts). **Avatar Build ticks the material flags for you:** every material in your avatar's folder gets "Used with Skeletal Mesh", and "Used with Morph Targets" when the avatar has face shapes (a missing flag made faces or eyes go black or parts go missing in the game). **"AI Generated" Workshop tag** for avatars and maps (group MADE WITH AI), so players can filter for it. **New node Play Upper Body Animation On Player (Local)** (and Stop): attacks and gestures while walking. **Car box:** Bounce (how much a crash gives back) and your own wheel Anim Blueprint.
+>
+> **0.5.4.2:** **Drivable cars.** Drop a rigged car mesh into your map as a Skeletal Mesh Actor, tick Drivable car under Details > VR Realms, and players can sit in it and drive it. No Blueprint, no wheel assets, no Anim Blueprint: wheels are found by bone name (wheel, tire or tyre), the front of the mesh faces +X. The same box sets top speed, acceleration, brakes, steering, grip, suspension, weight, the driven wheels and the engine sound, and says whether the mesh is ready to drive. The Drivable Car item in the Item list is a ready-made sedan. Cars need the next VR Realms update: they work today on the alpha branch, and not yet for players on the default branch. Guide: https://vr-realms.com/docs/maps-cars.html
 >
 > **0.5.4:** **Your own dares.** The Workshop panel has a Dares box under Change note: give up to 3 dares a title and a hint, and the kit makes each one's id. Press Copy tag and put that tag on any actor: a player who walks into it finishes the dare. Or call the new node Complete Dare (Local) with the id. Upload sends them; after review players find them on the Creator dares tab of the Dares page. They pay players gold, and you earn a little each time someone new finishes one. Also new in the Item list under Weapons: AS-97 Pad (a heavy pistol) and Grenade Pad.
 >
