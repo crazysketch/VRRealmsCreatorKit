@@ -42,6 +42,29 @@ function Fail($msg, $result = 0) {
     exit 1
 }
 
+# Plain words for the Steam answers creators actually meet (EResult numbers).
+function Words($code) {
+    switch ([int]$code) {
+        2  { return "Steam reported a general failure. Press Upload again in a minute." }
+        3  { return "The Steam app is not connected to Steam. Wait until it is online (or restart it), then press Upload again." }
+        6  { return "Your Steam account was signed in somewhere else (another PC, or SteamCMD), which signed this Steam app out. Sign the Steam app in again, then press Upload again." }
+        8  { return "Steam did not accept something in the request, usually a tag that is not defined for VR Realms." }
+        9  { return "Steam has no item with that Workshop ID for this account. The Steam app must be signed in as the account that made the item." }
+        15 { return "Access denied: you can only update a Workshop item your own Steam account made. To publish a new item of your own, empty the Workshop ID box." }
+        16 { return "Steam timed out. Check your internet, then press Upload again." }
+        17 { return "This Steam account is not allowed to publish to the Workshop (a community ban or a limited account)." }
+        20 { return "Steam's Workshop service is down for a moment. Press Upload again in a few minutes." }
+        21 { return "The Steam app is OFFLINE (Offline Mode, a lost connection, or your account was signed in somewhere else). In Steam, click Steam > Go Online, or quit and start Steam again, wait until your friends list shows you online, then press Upload again." }
+        24 { return "This Steam account may not publish yet. A limited account (one that has not spent 5 USD on Steam) cannot upload to the Workshop." }
+        25 { return "Limit exceeded: the preview image is 1 MB or larger, or your Steam account is out of Steam Cloud space for this game." }
+        84 { return "Steam's limit on NEW Workshop items for today is reached. If this item is already published, paste its ID into Workshop ID and Upload again (an update is not limited)." }
+        default { return "Steam answered with code $code." }
+    }
+}
+
+# The kit (0.5.4.3 DLL) adds its own words for 2, 3, 8, 9, 15, 16, 25 and 84: only the others here, so nothing shows twice.
+function Extra($code) { if (@(6, 17, 20, 21, 24) -contains [int]$code) { return (Words $code) } return "" }
+
 if (-not (Test-Path -LiteralPath $Job)) { Fail "The upload job file is missing: $Job" }
 $j = Get-Content -LiteralPath $Job -Raw -Encoding UTF8 | ConvertFrom-Json
 [uint64]$itemId = 0
@@ -93,6 +116,10 @@ public static class SteamUp
     public static extern IntPtr SteamAPI_SteamUser_v023();
     [DllImport("steam_api64.dll", CallingConvention = CallingConvention.Cdecl)]
     public static extern ulong SteamAPI_ISteamUser_GetSteamID(IntPtr self);
+    // True only while the Steam app is CONNECTED to Steam. The Steam ID above is known even offline.
+    [DllImport("steam_api64.dll", CallingConvention = CallingConvention.Cdecl)]
+    [return: MarshalAs(UnmanagedType.I1)]
+    public static extern bool SteamAPI_ISteamUser_BLoggedOn(IntPtr self);
 
     [DllImport("steam_api64.dll", CallingConvention = CallingConvention.Cdecl)]
     public static extern ulong SteamAPI_ISteamUGC_CreateItem(IntPtr self, uint appId, int fileType);
@@ -167,6 +194,20 @@ public static class SteamUp
         if ($ugc -eq [IntPtr]::Zero -or $utils -eq [IntPtr]::Zero) { Fail "Steam did not return the Workshop interface." }
         $me = [SteamUp]::SteamAPI_ISteamUser_GetSteamID($user)
         Write-Output "VRRUP_STEAMID=$me"
+        # The Steam ID is remembered even while the app is offline, so ask whether it is CONNECTED.
+        # Steam can take a moment after a start or a network blip: wait up to a minute.
+        if (-not [SteamUp]::SteamAPI_ISteamUser_BLoggedOn($user)) {
+            Write-Output "  The Steam app is not online yet; waiting up to a minute for it..."
+            $online = $false
+            $deadline = (Get-Date).AddSeconds(60)
+            while ((Get-Date) -lt $deadline) {
+                [SteamUp]::SteamAPI_RunCallbacks()
+                if ([SteamUp]::SteamAPI_ISteamUser_BLoggedOn($user)) { $online = $true; break }
+                Start-Sleep -Milliseconds 500
+            }
+            if (-not $online) { Fail ("Nothing was uploaded. " + (Words 21)) }
+            Write-Output "  The Steam app is online."
+        }
         if ($j.probe) { Write-Output "  The Steam app is signed in as $me and ready."; Write-Output "VRRUP_RESULT=1"; Write-Output "VRRUP_EULA=0"; exit 0 }
         Write-Output "  Uploading through the Steam app, signed in as $me"
 
@@ -187,7 +228,7 @@ public static class SteamUp
             if ($res -ne 1) {
                 Write-Output "VRRUP_RESULT=$res"
                 Write-Output "VRRUP_EULA=$eula"
-                Write-Output "VRRUP_ERROR=Steam would not make a new item (EResult $res)."
+                Write-Output ("VRRUP_ERROR=Steam would not make a new item (EResult $res). " + (Extra $res))
                 exit 1
             }
             $itemId = $id
@@ -258,7 +299,7 @@ public static class SteamUp
         Write-Output "VRRUP_RESULT=$res"
         Write-Output "VRRUP_EULA=$eula"
         if ($res -ne 1) {
-            Write-Output "VRRUP_ERROR=Steam did not accept the upload (EResult $res)."
+            Write-Output ("VRRUP_ERROR=Steam did not accept the upload (EResult $res). " + (Extra $res))
             exit 1
         }
         Write-Output "  Steam accepted the upload."
