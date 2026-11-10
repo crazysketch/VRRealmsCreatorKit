@@ -1,0 +1,8 @@
+{
+	"BuildId": "55116800",
+	"Modules": 
+	{
+		"VRRealmsScript": "UnrealEditor-VRRealmsScript.dll",
+		"VRRealmsScriptEditor": "UnrealEditor-VRRealmsScriptEditor.dll"
+	}
+}

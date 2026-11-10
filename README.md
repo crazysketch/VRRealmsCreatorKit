@@ -1,12 +1,14 @@
 # VR Realms Creator Kit
 
-**v0.5.4.4 (Alpha)** · Unreal Engine **5.8**
+**v0.5.5 (Alpha)** · Unreal Engine **5.8**
 
 Build maps and avatars for [VR Realms](https://vr-realms.com) and publish them to the Steam Workshop.
 
 No Visual Studio, no C++, no game source needed. Just Unreal Engine 5.8 and a Steam account that owns VR Realms.
 
-> **New in 0.5.4.4:** **Upload waits for Steam to be online:** if the Steam app is offline (Offline Mode, a lost connection, or your account signed in somewhere else), Upload waits up to a minute for it, then tells you in plain words what to do (Steam > Go Online, or restart Steam) instead of a bare Steam code. Other common Steam answers are explained too.
+> **New in 0.5.5:** **Lua scripting for your worlds (Beta):** add a VR Realms Script actor to your map and write Lua for it: zones, buttons, timers, Realm Events, text, points, moving and hiding objects, and your own Blueprint events. **Open Script Editor** on its Details gives a window with Lua colours, a syntax check as you type and a list of tested starter scripts to click in. A script that runs too long or uses too much is stopped, never the game, and it cannot reach files, the web or the console. Scripts run in VR Realms 0.4.3 and later. Guide: https://vr-realms.com/docs/api-lua.html. The Lua plugins are two new folders (VRRealms/Plugins/LuaMachine and VRRealms/Plugins/VRRealmsScript): the Creator Kit app adds them when it updates, or in VRR Updater press Verify files, then Repair. **Weapon adjuster:** type /gripadjust in a Test of your map (desktop), slide and turn a held item until it sits right, press Bake, then **Paste playtest grip** on the item's Held in hand box. **New nodes Save Text (Local) and Load Saved Text (Local)** keep a short text per world and player on that PC.
+>
+> **0.5.4.4:** **Upload waits for Steam to be online:** if the Steam app is offline (Offline Mode, a lost connection, or your account signed in somewhere else), Upload waits up to a minute for it, then tells you in plain words what to do (Steam > Go Online, or restart Steam) instead of a bare Steam code. Other common Steam answers are explained too.
 
 > **New in 0.5.4.3:** **Upload goes through the Steam app, tags included:** the files, title, description, preview AND tags go up in one step, and Steam is no longer signed out by the upload (no SteamCMD login needed; the old way stays as a setting). Upload asks for a MAP TYPE / AVATAR STYLE and an AUDIENCE tag and shows the tags before it sends. **Maps may be up to 1100 MB** (avatars stay 700 MB, 800 with parts). **Avatar Build ticks the material flags for you:** every material in your avatar's folder gets "Used with Skeletal Mesh", and "Used with Morph Targets" when the avatar has face shapes (a missing flag made faces or eyes go black or parts go missing in the game). **"AI Generated" Workshop tag** for avatars and maps (group MADE WITH AI), so players can filter for it. **New node Play Upper Body Animation On Player (Local)** (and Stop): attacks and gestures while walking. **Car box:** Bounce (how much a crash gives back) and your own wheel Anim Blueprint.
 >

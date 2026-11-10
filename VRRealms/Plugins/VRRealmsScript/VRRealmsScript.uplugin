@@ -1,0 +1,32 @@
+{
+	"FileVersion": 3,
+	"Version": 1,
+	"VersionName": "0.1",
+	"FriendlyName": "VR Realms Script",
+	"Description": "Lua scripting for VR Realms worlds: a Script actor that runs a creator's Lua on the host, with only the safe vrr / world commands (no files, no web, no native code). Runs on the locked-down LuaMachine copy in Plugins/LuaMachine.",
+	"Category": "VR Realms",
+	"CreatedBy": "VR Realms",
+	"CreatedByURL": "https://vr-realms.com",
+	"EnabledByDefault": true,
+	"CanContainContent": false,
+	"IsBetaVersion": true,
+	"Installed": false,
+	"Modules": [
+		{
+			"Name": "VRRealmsScript",
+			"Type": "Runtime",
+			"LoadingPhase": "Default",
+			"PlatformAllowList": [ "Win64", "Linux" ]
+		},
+		{
+			"Name": "VRRealmsScriptEditor",
+			"Type": "Editor",
+			"LoadingPhase": "Default",
+			"PlatformAllowList": [ "Win64" ]
+		}
+	],
+	"Plugins": [
+		{ "Name": "LuaMachine", "Enabled": true },
+		{ "Name": "VRRealmsCreatorKit", "Enabled": true }
+	]
+}
