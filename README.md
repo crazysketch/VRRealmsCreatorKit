@@ -1,11 +1,13 @@
 # VR Realms Creator Kit
 
-**v0.5.5 (Alpha)** · Unreal Engine **5.8**
+**v0.5.6 (Alpha)** · Unreal Engine **5.8**
 
 Build maps and avatars for [VR Realms](https://vr-realms.com) and publish them to the Steam Workshop.
 
 No Visual Studio, no C++, no game source needed. Just Unreal Engine 5.8 and a Steam account that owns VR Realms.
 
+> **New in 0.5.6:** **Your maps and avatars on the Steam Frame:** VR Realms also runs on its own on the Steam Frame (its Android version), and Build now makes a second copy of your item for it (`<YourItem>_Android.vrrpak`, beside the Windows pak). One Upload sends both; Frame players get the Frame copy, everyone else the Windows pak as before. Nothing to install: no Android Studio, no Android SDK. If a Frame copy ever fails, Build still makes the Windows pak and says why. Older items reach the Frame when they are built and uploaded again. Lua scripts do not run on the Frame yet.
+>
 > **New in 0.5.5:** **Lua scripting for your worlds (Beta):** add a VR Realms Script actor to your map and write Lua for it: zones, buttons, timers, Realm Events, text, points, moving and hiding objects, and your own Blueprint events. **Open Script Editor** on its Details gives a window with Lua colours, a syntax check as you type and a list of tested starter scripts to click in. A script that runs too long or uses too much is stopped, never the game, and it cannot reach files, the web or the console. Scripts run in VR Realms 0.4.3 and later. Guide: https://vr-realms.com/docs/api-lua.html. The Lua plugins are two new folders (VRRealms/Plugins/LuaMachine and VRRealms/Plugins/VRRealmsScript): the Creator Kit app adds them when it updates, or in VRR Updater press Verify files, then Repair. **Weapon adjuster:** type /gripadjust in a Test of your map (desktop), slide and turn a held item until it sits right, press Bake, then **Paste playtest grip** on the item's Held in hand box. **New nodes Save Text (Local) and Load Saved Text (Local)** keep a short text per world and player on that PC.
 >
 > **0.5.4.4:** **Upload waits for Steam to be online:** if the Steam app is offline (Offline Mode, a lost connection, or your account signed in somewhere else), Upload waits up to a minute for it, then tells you in plain words what to do (Steam > Go Online, or restart Steam) instead of a bare Steam code. Other common Steam answers are explained too.
