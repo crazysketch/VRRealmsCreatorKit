@@ -1,11 +1,13 @@
 # VR Realms Creator Kit
 
-**v0.5.7 (Alpha)** · Unreal Engine **5.8**
+**v0.5.8 (Alpha)** · Unreal Engine **5.8**
 
 Build maps and avatars for [VR Realms](https://vr-realms.com) and publish them to the Steam Workshop.
 
 No Visual Studio, no C++, no game source needed. Just Unreal Engine 5.8 and a Steam account that owns VR Realms.
 
+> **New in 0.5.8:** **Build for Windows only when you want a quick test:** under Build Map Pak and Build Avatar Pak there is now an **Also build for Steam Frame (standalone headset)** box. It starts ticked. Untick it and Build makes only the Windows pak, which is much quicker. The box is remembered for each item. Steam Frame players do not get an item built without it, so Upload asks before it sends a build that has no Frame copy (an upload without one also takes an earlier Frame copy off the item). Tick it again before your real upload.
+>
 > **New in 0.5.7:** **The Lua script window works like a code editor:** line numbers; select several lines and press Tab (or Shift+Tab) to move them all in or out; **Ctrl+F** to find (Enter / F3 for the next one) and **Ctrl+G** to go to a line. **Suggestions as you type:** after `vrr.`, `world.` or `player:` it lists the commands that fit, typing part of a name (say `annou`) offers the whole command, and inside the brackets it shows how to call it. Tab or Enter puts it in. **Open in your own editor:** the Open in... button opens the script in VS Code, Notepad++, Visual Studio or any program you pick; when you save there, the text comes back into the window and the Script actor by itself while the window is open. In VS Code with its free "Lua" extension (by sumneko) the VR Realms commands are suggested too.
 >
 > **New in 0.5.6:** **Your maps and avatars on the Steam Frame:** VR Realms also runs on its own on the Steam Frame (its Android version), and Build now makes a second copy of your item for it (`<YourItem>_Android.vrrpak`, beside the Windows pak). One Upload sends both; Frame players get the Frame copy, everyone else the Windows pak as before. Nothing to install: no Android Studio, no Android SDK. If a Frame copy ever fails, Build still makes the Windows pak and says why. Older items reach the Frame when they are built and uploaded again. Lua scripts do not run on the Frame yet.
