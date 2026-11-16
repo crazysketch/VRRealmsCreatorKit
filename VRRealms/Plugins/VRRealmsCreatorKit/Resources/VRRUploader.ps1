@@ -15,7 +15,11 @@
 
     INPUT: -Job <path to a UTF-8 JSON file> with
       itemId (string, "" or "0" = make a new item), contentFolder, previewFile (may be ""),
-      title, description, changeNote, tags (array), visibility (0 = Public; optional, default 0)
+      title, description, changeNote, tags (array), visibility (0 = Public; optional, default 0),
+      questFile + questCheck (optional, kit 0.5.8+): the item's Steam Frame and Quest copy and its Quest check numbers.
+      After Steam accepts the item, that copy also goes to vr-realms.com for Meta Quest players (a Quest has no
+      Steam): a Steam sign-in ticket proves which account this is, the website checks with Steam that the item
+      is that account's, gives a one hour link to its storage, and lists the item once the file is there.
 
     OUTPUT CONTRACT - the kit parses these, do not rename them:
       VRRUP_STEAMID=<id>          who the Steam app is signed in as
@@ -24,6 +28,7 @@
       VRRUP_RESULT=<n>            Steam EResult of the final submit. 1 = OK. 0 = never got that far
       VRRUP_EULA=<0|1>            1 = the account has not accepted the Workshop legal agreement
       VRRUP_ERROR=<text>          single-line reason, present only on failure
+      VRRUP_QUEST=<answer>        only with questFile: "ok", "skipped: <why>" or "failed: <why>" (never fails the upload)
     Everything else printed here is for people and is echoed into the kit's log.
 #>
 
@@ -115,6 +120,10 @@ public static class SteamUp
     [DllImport("steam_api64.dll", CallingConvention = CallingConvention.Cdecl)]
     public static extern IntPtr SteamAPI_SteamUser_v023();
     [DllImport("steam_api64.dll", CallingConvention = CallingConvention.Cdecl)]
+    public static extern uint SteamAPI_ISteamUser_GetAuthSessionTicket(IntPtr self, IntPtr pTicket, int cbMaxTicket, ref uint pcbTicket, IntPtr pIdentity);
+    [DllImport("steam_api64.dll", CallingConvention = CallingConvention.Cdecl)]
+    public static extern void SteamAPI_ISteamUser_CancelAuthTicket(IntPtr self, uint hAuthTicket);
+    [DllImport("steam_api64.dll", CallingConvention = CallingConvention.Cdecl)]
     public static extern ulong SteamAPI_ISteamUser_GetSteamID(IntPtr self);
     // True only while the Steam app is CONNECTED to Steam. The Steam ID above is known even offline.
     [DllImport("steam_api64.dll", CallingConvention = CallingConvention.Cdecl)]
@@ -180,6 +189,108 @@ public static class SteamUp
             Start-Sleep -Milliseconds 150
         }
         return $null   # timed out
+    }
+
+    # ---- the Quest copy (kit 0.5.8+) ---------------------------------------------------------------
+    # The website answers 200 with {"ok":false,"error":...,"message":...} for every refusal; this reads any answer.
+    function Post-Site($body) {
+        $req = [Net.HttpWebRequest]::Create('https://vr-realms.com/api/kit_quest.php')
+        $req.Method = 'POST'; $req.ContentType = 'application/json'; $req.UserAgent = 'VRRealmsCreatorKit'; $req.Timeout = 60000
+        $bytes = [Text.Encoding]::UTF8.GetBytes(($body | ConvertTo-Json -Compress))
+        $req.ContentLength = $bytes.Length
+        try {
+            $s = $req.GetRequestStream(); $s.Write($bytes, 0, $bytes.Length); $s.Close()
+            $resp = $req.GetResponse()
+        } catch [Net.WebException] {
+            $resp = $_.Exception.Response
+            if (-not $resp) { return @{ ok = $false; error = 'net'; message = ('the website did not answer (' + $_.Exception.Message + ')') } }
+        }
+        $reader = New-Object IO.StreamReader($resp.GetResponseStream()); $text = $reader.ReadToEnd(); $reader.Close(); $resp.Close()
+        try { return ($text | ConvertFrom-Json) } catch { return @{ ok = $false; error = 'bad'; message = 'the website gave an answer this kit cannot read' } }
+    }
+
+    # Sends the file straight to the storage behind a signed link, in 4 MB pieces, never all in memory.
+    function Put-File($url, $path, [int64]$size) {
+        $req = [Net.HttpWebRequest]::Create($url)
+        $req.Method = 'PUT'; $req.AllowWriteStreamBuffering = $false; $req.ContentLength = $size
+        $req.Timeout = 3600000; $req.ReadWriteTimeout = 600000
+        $in = [IO.File]::OpenRead($path)
+        try {
+            $out = $req.GetRequestStream()
+            $chunk = New-Object byte[] (4MB); [int64]$sent = 0; $last = -10
+            while (($n = $in.Read($chunk, 0, $chunk.Length)) -gt 0) {
+                $out.Write($chunk, 0, $n); $sent += $n
+                $pct = [int][Math]::Floor(100.0 * $sent / $size)
+                if ($pct -ge $last + 10) { Write-Output ("  Quest copy: sent {0}% ({1:N0} of {2:N0} MB)" -f $pct, ($sent / 1MB), ($size / 1MB)); $last = $pct }
+            }
+            $out.Close()
+            $resp = $req.GetResponse(); $code = [int]$resp.StatusCode; $resp.Close()
+            return $code
+        } catch [Net.WebException] {
+            if ($_.Exception.Response) { return [int]$_.Exception.Response.StatusCode }
+            return 0
+        } finally { $in.Close() }
+    }
+
+    function Send-QuestCopy($user, [uint64]$item, $job) {
+        $file = [string]$job.questFile
+        $check = $job.questCheck
+        if (-not $file -or -not $check) { return }
+        if (-not (Test-Path -LiteralPath $file)) { Write-Output "VRRUP_QUEST=skipped: the Quest copy is not in the build folder"; return }
+        $kind = [string]$check.kind
+        if ($kind -ne 'avatar' -and $kind -ne 'map') { Write-Output "VRRUP_QUEST=skipped: only avatars and worlds are listed for Quest"; return }
+        if ($visibility -ne 0) { Write-Output "VRRUP_QUEST=skipped: only public items are listed for Quest"; return }
+        [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+        Write-Output ""
+        Write-Output "  ====== SENDING THE QUEST COPY TO VR-REALMS.COM ======"
+        $size = (Get-Item -LiteralPath $file).Length
+        $sha = (Get-FileHash -LiteralPath $file -Algorithm SHA256).Hash.ToLower()
+
+        # A ticket from the Steam app proves which account this is; the website asks Steam about it and keeps nothing of it.
+        $tbuf = [Runtime.InteropServices.Marshal]::AllocHGlobal(2048)
+        [uint32]$tlen = 0
+        $ht = [SteamUp]::SteamAPI_ISteamUser_GetAuthSessionTicket($user, $tbuf, 2048, [ref]$tlen, [IntPtr]::Zero)
+        if ($ht -eq 0 -or $tlen -eq 0) { Write-Output "VRRUP_QUEST=failed: the Steam app gave no sign-in ticket"; return }
+        $tb = New-Object byte[] $tlen
+        [Runtime.InteropServices.Marshal]::Copy($tbuf, $tb, 0, [int]$tlen)
+        $ticket = -join ($tb | ForEach-Object { $_.ToString('x2') })
+        try {
+            # A new ticket takes Steam's servers a moment to know.
+            $until = (Get-Date).AddSeconds(3)
+            while ((Get-Date) -lt $until) { [SteamUp]::SteamAPI_RunCallbacks(); Start-Sleep -Milliseconds 100 }
+
+            $body = @{ step = 'begin'; steam_id = "$me"; ticket = $ticket; item_id = "$item"; kind = $kind
+                       file = [IO.Path]::GetFileName($file); size = $size; sha256 = $sha
+                       tris = [int64]$check.tris; mats = [int]$check.mats; lights = [int]$check.lights; tex = [int]$check.tex }
+            $begin = $null
+            for ($try = 1; $try -le 5; $try++) {
+                $begin = Post-Site $body
+                # A NEW item takes Steam a little while to show in its public list.
+                if ($begin.ok -or [string]$begin.error -ne 'not_listed_yet') { break }
+                Write-Output "  Quest copy: Steam has not listed the item publicly yet; trying again in 15 seconds..."
+                $until = (Get-Date).AddSeconds(15)
+                while ((Get-Date) -lt $until) { [SteamUp]::SteamAPI_RunCallbacks(); Start-Sleep -Milliseconds 250 }
+            }
+        } finally {
+            [SteamUp]::SteamAPI_ISteamUser_CancelAuthTicket($user, $ht)
+            [Runtime.InteropServices.Marshal]::FreeHGlobal($tbuf)
+        }
+        if (-not $begin.ok) {
+            $why = if ($begin.message) { [string]$begin.message } else { [string]$begin.error }
+            $word = if (@('mature', 'too_big') -contains [string]$begin.error) { 'skipped' } else { 'failed' }
+            Write-Output ("VRRUP_QUEST=$word" + ": " + ($why -replace '\r?\n', ' '))
+            return
+        }
+        $code = Put-File ([string]$begin.put) $file $size
+        if ($code -lt 200 -or $code -ge 300) { Write-Output "VRRUP_QUEST=failed: the storage did not take the file (http $code)"; return }
+        $fin = Post-Site @{ step = 'finish'; item_id = "$item"; finish_key = [string]$begin.finish_key }
+        if ($fin.ok) {
+            Write-Output "  Quest copy: on vr-realms.com."
+            Write-Output "VRRUP_QUEST=ok"
+        } else {
+            $why = if ($fin.message) { [string]$fin.message } else { [string]$fin.error }
+            Write-Output "VRRUP_QUEST=failed: $why"
+        }
     }
 
     $err = New-Object System.Text.StringBuilder 1024
@@ -303,6 +414,7 @@ public static class SteamUp
             exit 1
         }
         Write-Output "  Steam accepted the upload."
+        try { Send-QuestCopy $user $itemId $j } catch { Write-Output ("VRRUP_QUEST=failed: " + ($_.Exception.Message -replace '\r?\n', ' ')) }
         exit 0
     }
     finally {
