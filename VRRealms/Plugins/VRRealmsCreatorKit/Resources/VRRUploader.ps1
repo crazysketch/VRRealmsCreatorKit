@@ -221,7 +221,9 @@ public static class SteamUp
             while (($n = $in.Read($chunk, 0, $chunk.Length)) -gt 0) {
                 $out.Write($chunk, 0, $n); $sent += $n
                 $pct = [int][Math]::Floor(100.0 * $sent / $size)
-                if ($pct -ge $last + 10) { Write-Output ("  Quest copy: sent {0}% ({1:N0} of {2:N0} MB)" -f $pct, ($sent / 1MB), ($size / 1MB)); $last = $pct }
+                # Straight to the console: anything a function writes with Write-Output becomes part of what it RETURNS, and the
+                # caller then read text + 200 as "not 200" (11-16, his first real Quest copy: stored, then called failed).
+                if ($pct -ge $last + 10) { [Console]::Out.WriteLine(("  Quest copy: sent {0}% ({1:N0} of {2:N0} MB)" -f $pct, ($sent / 1MB), ($size / 1MB))); [Console]::Out.Flush(); $last = $pct }
             }
             $out.Close()
             $resp = $req.GetResponse(); $code = [int]$resp.StatusCode; $resp.Close()
@@ -281,7 +283,7 @@ public static class SteamUp
             Write-Output ("VRRUP_QUEST=$word" + ": " + ($why -replace '\r?\n', ' '))
             return
         }
-        $code = Put-File ([string]$begin.put) $file $size
+        $code = @(Put-File ([string]$begin.put) $file $size)[-1]   # the last thing it returns is the answer, whatever came before
         if ($code -lt 200 -or $code -ge 300) { Write-Output "VRRUP_QUEST=failed: the storage did not take the file (http $code)"; return }
         $fin = Post-Site @{ step = 'finish'; item_id = "$item"; finish_key = [string]$begin.finish_key }
         if ($fin.ok) {

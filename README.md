@@ -1,11 +1,13 @@
 # VR Realms Creator Kit
 
-**v0.5.8.1 (Alpha)** · Unreal Engine **5.8**
+**v0.5.8.2 (Alpha)** · Unreal Engine **5.8**
 
 Build maps and avatars for [VR Realms](https://vr-realms.com) and publish them to the Steam Workshop.
 
 No Visual Studio, no C++, no game source needed. Just Unreal Engine 5.8 and a Steam account that owns VR Realms.
 
+> **New in 0.5.8.2:** **Fixed: the Quest copy reaches Quest players.** Upload sent the headset copy to vr-realms.com but then said it had failed, so the copy was never listed for Quest players. Press Upload again on an item you uploaded with 0.5.8 or 0.5.8.1 to send its Quest copy.
+>
 > **New in 0.5.8.1:** **The headset box is easy to see:** it sits in its own framed box with a heading, Standalone headsets (Steam Frame, Meta Quest), right above Build Map Pak and Build Avatar Pak, and says what a ticked box does. The Quest check in the Build log is a plain warning line now (it was marked ERROR although nothing had failed).
 >
 > **New in 0.5.8:** **A copy for the Meta Quest too, with a Quest check:** the box above Build Map Pak and Build Avatar Pak is now **Also build for Steam Frame and Quest (standalone headsets)**. The headset copy it makes is the one the Steam Frame uses and the one the Meta Quest version of VR Realms (being tested now) will use. **Quest check:** Build writes in the log what a standalone headset has to draw: for an avatar its triangles and materials (good up to 15,000 triangles; over 25,000 triangles or over 4 materials it is heavy, and Quest players see a stand-in body until they choose to show it), for a world its triangles, materials and moving lights that cast shadows. These are warnings only; Build never stops for them. **Smaller pictures for the headset copy:** it cooks pictures at 1024 px at most for an avatar and 2048 px for a world, so it downloads quickly; your PC copy is not changed. A headset copy may be 40 MB for an avatar and 500 MB for a world; a bigger one is left out and the Windows pak still builds. **Upload** also sends the headset copy to vr-realms.com for Quest players, right after Steam takes your upload. Your own Steam app proves the item is yours; nothing to sign in to. If that step fails, your Steam upload still counts. **Build for Windows only when you want a quick test:** untick the box and Build makes only the Windows pak, which is much quicker. The box is remembered for each item. Headset players do not get an item built without it, so Upload asks before it sends a build that has no headset copy (an upload without one also takes an earlier headset copy off the item). Tick it again before your real upload. **Fixed:** the Lua script window showed two scroll bars side by side and the outer one did not move; now there is one, and it works.
