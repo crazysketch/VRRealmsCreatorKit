@@ -27,6 +27,7 @@
 	],
 	"Plugins": [
 		{ "Name": "LuaMachine", "Enabled": true },
+		{ "Name": "Niagara", "Enabled": true },
 		{ "Name": "VRRealmsCreatorKit", "Enabled": true }
 	]
 }

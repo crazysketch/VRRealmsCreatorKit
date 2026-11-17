@@ -1,11 +1,13 @@
 # VR Realms Creator Kit
 
-**v0.5.8.2 (Alpha)** · Unreal Engine **5.8**
+**v0.5.8.6 (Alpha)** · Unreal Engine **5.8**
 
 Build maps and avatars for [VR Realms](https://vr-realms.com) and publish them to the Steam Workshop.
 
 No Visual Studio, no C++, no game source needed. Just Unreal Engine 5.8 and a Steam account that owns VR Realms.
 
+> **New in 0.5.8.6:** **Lua scripts can do much more (API level 2, Beta):** run code every frame (`vrr.on_tick`), look around with `vrr.trace`, read the player's head and hands and, in an Every player's machine script, their own sticks, triggers, grips and buttons. Call your Blueprint's functions whose names start with `Lua_` and get their outputs back (`obj:fn`); new Blueprint nodes **Send To Script** and **Get Script Value** talk the other way. Play Niagara effects and sounds, spawn your Blueprint actors, move, scale and attach them, and shoot with `vrr.projectile`. Make small panels in the world with text, bars and buttons (`vrr.panel`), and send messages between a script's copies (`vrr.send_host`, `vrr.send_all`, `vrr.send_to`). Effects, sounds and spawned Blueprints are listed on the new **VR Realms Script Assets** actor (only assets of your map's own folder). While you play your map, saving the script (in the window or in VS Code) restarts it with the new text. `vrr.log` now reaches the game's log file. ⚠ **These commands need the next VR Realms update** (the game that runs them is being tested now): start a script that uses them with `if not vrr.api or vrr.api < 2 then ... return end`; with an older game such a script sees `vrr.api` as nil. The Lua plugin is in the full kit download: the Creator Kit app updates it, or in VRR Updater press Verify files, then Repair.
+>
 > **New in 0.5.8.2:** **Fixed: the Quest copy reaches Quest players.** Upload sent the headset copy to vr-realms.com but then said it had failed, so the copy was never listed for Quest players. Press Upload again on an item you uploaded with 0.5.8 or 0.5.8.1 to send its Quest copy.
 >
 > **New in 0.5.8.1:** **The headset box is easy to see:** it sits in its own framed box with a heading, Standalone headsets (Steam Frame, Meta Quest), right above Build Map Pak and Build Avatar Pak, and says what a ticked box does. The Quest check in the Build log is a plain warning line now (it was marked ERROR although nothing had failed).
