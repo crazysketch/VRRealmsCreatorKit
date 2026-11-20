@@ -20,6 +20,7 @@
       After Steam accepts the item, that copy also goes to vr-realms.com for Meta Quest players (a Quest has no
       Steam): a Steam sign-in ticket proves which account this is, the website checks with Steam that the item
       is that account's, gives a one hour link to its storage, and lists the item once the file is there.
+      questOnly (optional, true): send ONLY that Quest copy for the existing item itemId; nothing goes to Steam.
 
     OUTPUT CONTRACT - the kit parses these, do not rename them:
       VRRUP_STEAMID=<id>          who the Steam app is signed in as
@@ -322,6 +323,17 @@ public static class SteamUp
             Write-Output "  The Steam app is online."
         }
         if ($j.probe) { Write-Output "  The Steam app is signed in as $me and ready."; Write-Output "VRRUP_RESULT=1"; Write-Output "VRRUP_EULA=0"; exit 0 }
+        # ---- only the Quest copy (kit "Quest copies for all my items", 2026-11-16) -----------------------
+        # The Steam Workshop item is not touched: no files, title, tags or change note go to Steam. The Steam app is only
+        # asked for the sign-in ticket that proves to vr-realms.com that the item is this account's.
+        if ($j.questOnly) {
+            if ($itemId -eq 0) { Fail "A Quest copy goes with a Workshop item that exists: its Workshop ID is missing." }
+            Write-Output "  Sending only the Quest copy of item $itemId (the Steam Workshop item stays as it is), signed in as $me"
+            Write-Output "VRRUP_RESULT=1"
+            Write-Output "VRRUP_EULA=0"
+            try { Send-QuestCopy $user $itemId $j } catch { Write-Output ("VRRUP_QUEST=failed: " + ($_.Exception.Message -replace '\r?\n', ' ')) }
+            exit 0
+        }
         Write-Output "  Uploading through the Steam app, signed in as $me"
 
         $buf = [Runtime.InteropServices.Marshal]::AllocHGlobal(32)

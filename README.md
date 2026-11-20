@@ -1,11 +1,13 @@
 # VR Realms Creator Kit
 
-**v0.5.8.6 (Alpha)** · Unreal Engine **5.8**
+**v0.5.9 (Alpha)** · Unreal Engine **5.8**
 
 Build maps and avatars for [VR Realms](https://vr-realms.com) and publish them to the Steam Workshop.
 
 No Visual Studio, no C++, no game source needed. Just Unreal Engine 5.8 and a Steam account that owns VR Realms.
 
+> **New in 0.5.9:** **Ready items to drag into your map.** The **Place Actors** panel has a **Realms** page (it opens by itself when the kit starts; it is also under Tools → VR Realms Items, and behind the purple **Place items in your map** button of the Workshop tab): 33 ready items with a picture each, in groups (TV and music, Mirror, Drawing, Weapons, Gun match, Ball games, Movement, Map). Drag one into the level, or double click it, and it arrives set up. Sets arrive linked: **TV with control bar**, **Mirror with panel**, **Drawing set**, and a **Gun match starter** (rules, 8 respawn points, a scoreboard, 4 weapon pads). **A short Details panel:** select an item and you see its name, one sentence that says what it will do, and only its own settings. Everything else is under **Advanced** (Game mode, Match role, Movement mode and Game device wait there on things that are none of them; a setting that is in use always stays in sight). New ticks for what used to be typed by hand: **Flip the picture**, **Show my mesh in game**, **Hidden in game**, **Max players**. A TV has **Add a control bar**, a mirror has **Add a settings panel**, and a ball home picks its scoring zone with the eyedropper. **You see what is linked and what is missing:** a selected item shows a line to its partner, an item that will not work shows a warning over it, and the Realms page lists what the map still needs (a gun match with no respawn point, a control bar with no TV). **A failed upload opens a window** that says why, for example that the Steam app is not online. Old maps and markers work as before: a drop makes the same marker with the same tags, so nothing changes for the game. Also new, early: **Make Quest copies for all my items** on the Workshop tab's home page sends the headset copy of every item of this project that is already on the Workshop.
+>
 > **New in 0.5.8.6:** **Lua scripts can do much more (API level 2, Beta):** run code every frame (`vrr.on_tick`), look around with `vrr.trace`, read the player's head and hands and, in an Every player's machine script, their own sticks, triggers, grips and buttons. Call your Blueprint's functions whose names start with `Lua_` and get their outputs back (`obj:fn`); new Blueprint nodes **Send To Script** and **Get Script Value** talk the other way. Play Niagara effects and sounds, spawn your Blueprint actors, move, scale and attach them, and shoot with `vrr.projectile`. Make small panels in the world with text, bars and buttons (`vrr.panel`), and send messages between a script's copies (`vrr.send_host`, `vrr.send_all`, `vrr.send_to`). Effects, sounds and spawned Blueprints are listed on the new **VR Realms Script Assets** actor (only assets of your map's own folder). While you play your map, saving the script (in the window or in VS Code) restarts it with the new text. `vrr.log` now reaches the game's log file. ⚠ **These commands need the next VR Realms update** (the game that runs them is being tested now): start a script that uses them with `if not vrr.api or vrr.api < 2 then ... return end`; with an older game such a script sees `vrr.api` as nil. The Lua plugin is in the full kit download: the Creator Kit app updates it, or in VRR Updater press Verify files, then Repair.
 >
 > **New in 0.5.8.2:** **Fixed: the Quest copy reaches Quest players.** Upload sent the headset copy to vr-realms.com but then said it had failed, so the copy was never listed for Quest players. Press Upload again on an item you uploaded with 0.5.8 or 0.5.8.1 to send its Quest copy.
@@ -77,7 +79,7 @@ Full details + troubleshooting → [Build an Avatar](https://vr-realms.com/docs/
 2. Tools → VR Realms Workshop → **Worlds** → pick your level
 3. Build Map Pak → fill in info → Upload
 
-Interactables (screens, jukeboxes, mirrors, game devices, etc.) are dropped in with `BP_VRItemMarker`.
+Interactables (screens, mirrors, weapon pads, game modes and more) wait on the **Realms** page of the **Place Actors** panel: drag one into your level and it arrives set up, then select it for its few settings. They are still `BP_VRItemMarker` actors with tags, so old maps work as before.
 Want game logic? See the [Scripting API](https://vr-realms.com/docs/api.html) for the allowed nodes.
 
 **Sticks, buttons and things you drive (needs VR Realms 0.2.4):** read a player's sticks and triggers with
@@ -105,7 +107,7 @@ right, left or either, **Hold animation** is optional, **Clip time** shows any m
 grip. In game since VR Realms 0.3.0, desktop players first: E puts the item in the hand the way you placed it.
 VR players grab as before. A Hold animation and the skeleton it was made on must be inside your map's folder.
 
-**Gun matches (the new parts need VR Realms 0.3.3):** set an item marker's **Item** to **Rifle Pad**, **Pistol Pad** or **SMG Pad** (Weapons) for guns, and to **Health Pickup** or **Shield Pickup** (Match) for a heart (50 health, back after 20 seconds) or a shield (50
+**Gun matches (the new parts need VR Realms 0.3.3):** drag the **Gun match starter** from the Realms page (rules, respawn points, a scoreboard and weapon pads in one drop), or drag them one by one: **Rifle pad**, **Pistol pad** or **SMG pad** for guns, and **Health pickup** or **Shield pickup** for a heart (50 health, back after 20 seconds) or a shield (50
 shield points, back after 30 seconds) that sits on the floor under the marker. Taking a gun from a pad costs a little gold in game. A map
 that is also a place to hang out: draw a Trigger Box around the match and set its **Match role** to **Match area (arena box)**. Inside it the
 guns work, a gun carried out of it dissolves and shots stop at its walls. A map that is all match needs none.
